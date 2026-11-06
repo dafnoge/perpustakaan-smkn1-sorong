@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perpustakaan Digital - SMKN 1 Sorong</title>
+    
+    <!-- CDN Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- CDN Supabase JS Library (Versi 2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Google Font: Poppins & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Sembunyikan scrollbar bawaan untuk carousel */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Scrollbar Horizontal Kustom untuk Kategori */
+        .category-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .category-scrollbar::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.2);
+            border-radius: 9999px;
+        }
+        .category-scrollbar::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 9999px;
+        }
+        .category-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+        .category-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 rgba(241, 245, 249, 0.2);
+        }
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* Animasi transisi kaskade */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in {
+            animation: fadeInDown 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- =========================================================================
+         1. NAVBAR MINIMALIS RESPONSIF (ANTI-OVERLAP DENGAN TOMBOL LOKASI)
+         ========================================================================= -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                
+                <!-- Logo & Brand SMKN 1 SORONG -->
+                <a href="index.html" class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                    <img 
+                        src="assets/logo-smk1sorong.png" 
+                        alt="Logo SMKN 1 Sorong" 
+                        onerror="this.onerror=null; this.src='assets/logo-smkn1sorong.png';" 
+                        class="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl p-0.5 border border-slate-200 bg-white shadow-xs"
+                    >
+                    <span class="text-xs sm:text-base font-black tracking-tight text-blue-950 uppercase select-none">
+                        SMKN 1 SORONG
+                    </span>
+                </a>
+
+                <!-- Sisi Kanan: Panduan Kios, Lokasi & Portal Admin -->
+                <div class="flex items-center space-x-1.5 sm:space-x-2.5">
+                    
+                    <!-- Tombol Panduan Kios Komputer -->
+                    <button 
+                        type="button"
+                        onclick="openKioskGuideModal()" 
+                        class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 transition shadow-2xs"
+                        title="Panduan 3 langkah mudah meminjam buku di komputer perpustakaan"
+                    >
+                        <span>❓</span>
+                        <span class="ml-1 hidden xs:inline sm:inline">Panduan Kios</span>
+                    </button>
+
+                    <!-- Tombol Navigasi Scroll ke "Lokasi & Profil" -->
+                    <a 
+                        href="#profilLokasiSection" 
+                        class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-900 border border-slate-200 transition"
+                        title="Lihat Profil & Lokasi Sekolah"
+                    >
+                        <span>📍</span>
+                        <span class="ml-1 hidden xs:inline sm:inline">Lokasi & Profil</span>
+                    </a>
+
+                    <!-- Tombol Portal Admin -->
+                    <a 
+                        href="login.html" 
+                        class="inline-flex items-center px-2.5 py-1 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold rounded-xl bg-blue-900 text-white hover:bg-blue-800 transition shadow-xs flex-shrink-0"
+                    >
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        <span class="hidden sm:inline">Portal Admin</span>
+                        <span class="sm:hidden">Admin</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         2. HERO BANNER GLASSMORPHISM & SEARCH BAR DUA TINGKAT (KASKADE)
+         ========================================================================= -->
+    <section class="relative bg-slate-900 text-white overflow-hidden py-10 sm:py-16">
+        <!-- Background Hero Banner: Ayo Bangun SMKN 1 Sorong -->
+        <div 
+            class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950"
+            style="background-image: url('assets/Ayo Bangun.jpg');"
+        ></div>
+        
+        <!-- Overlay Gradien Biru Tua Transparan -->
+        <div class="absolute inset-0 bg-gradient-to-b from-blue-950/90 via-blue-900/85 to-slate-900/95"></div>
+
+        <div class="relative max-w-5xl mx-auto px-3 sm:px-6 text-center space-y-4">
+            
+            <div class="inline-flex items-center space-x-1.5 bg-amber-400 text-blue-950 text-[10px] sm:text-xs px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-md animate-pulse">
+                <span>⭐</span>
+                <span>Perpustakaan Digital SMKN 1 Sorong</span>
+            </div>
+
+            <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                SMK NEGERI 1 SORONG<br class="hidden sm:inline">
+                <span class="text-amber-300">Perpustakaan Digital</span>
+            </h1>
+
+            <p class="text-xs sm:text-sm text-blue-100 max-w-2xl mx-auto leading-relaxed">
+                Akses modul kurikulum nasional, referensi 8 jurusan kejuruan resmi, dan koleksi lengkap Tes Kemampuan Akademik (TKA).
+            </p>
+
+            <div class="flex items-center justify-center space-x-2 pt-0.5">
+                <button 
+                    type="button" 
+                    onclick="openKioskGuideModal()" 
+                    class="inline-flex items-center space-x-1.5 bg-white/15 hover:bg-white/25 text-amber-300 text-xs px-4 py-1.5 rounded-full font-bold border border-white/20 transition backdrop-blur-md shadow-xs hover:scale-105 active:scale-95"
+                >
+                    <span>❓</span>
+                    <span>Panduan 3 Langkah Pinjam di Kios</span>
+                </button>
+            </div>
+
+            <!-- Wadah Glassmorphism Pencarian & Filter -->
+            <div class="max-w-3xl mx-auto pt-2">
+                <div class="glass-card rounded-3xl p-3 sm:p-5 shadow-2xl text-left space-y-3">
+                    
+                    <!-- Search Input Box -->
+                    <div class="relative flex items-center">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Cari judul buku, penulis, materi kelas, atau jurusan..." 
+                            class="w-full pl-11 pr-10 py-3 bg-white text-slate-800 rounded-2xl shadow-inner text-xs sm:text-sm focus:outline-none focus:ring-4 focus:ring-amber-400 transition"
+                        >
+                        <svg class="w-5 h-5 text-slate-400 absolute left-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <button id="clearSearchBtn" class="hidden absolute right-3.5 text-slate-400 hover:text-slate-600 font-bold text-xs p-1">
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Tingkat 1: Pill Badges Kategori Utama -->
+                    <div>
+                        <div class="text-[11px] font-bold text-blue-200 mb-1.5 flex items-center justify-between">
+                            <span class="flex items-center">
+                                <span>Pilih Kategori Utama:</span>
+                                <span class="ml-2 text-[10px] text-blue-300 font-normal hidden sm:inline">(Geser untuk melihat semua)</span>
+                            </span>
+                            <span id="activeFilterLabel" class="text-amber-300 text-[10px]">Semua Koleksi</span>
+                        </div>
+                        
+                        <!-- Navigasi Geser Kategori dengan Panah Kiri-Kanan -->
+                        <div class="relative flex items-center group">
+                            <!-- Tombol Panah Geser Kiri -->
+                            <button 
+                                type="button" 
+                                onclick="scrollCategories(-180)" 
+                                aria-label="Geser kategori ke kiri"
+                                class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-blue-950/70 hover:bg-blue-900 text-white backdrop-blur-md border border-white/20 mr-1.5 flex-shrink-0 transition shadow-sm hover:scale-105 active:scale-95 z-10"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+
+                            <!-- Kontainer Pill Kategori dengan Kustom Scrollbar -->
+                            <div 
+                                id="categoryPillsContainer" 
+                                class="flex items-center space-x-1.5 sm:space-x-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-slate-100 category-scrollbar py-2 scroll-smooth flex-grow"
+                            >
+                                <button onclick="selectMainCategory('ALL')" class="pill-btn active px-3 py-1.5 rounded-full text-xs font-bold transition bg-amber-400 text-blue-950 flex-shrink-0" data-category="ALL">
+                                    Semua Kategori
+                                </button>
+                                <button onclick="selectMainCategory('TKA')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="TKA">
+                                    🔥 Khusus TKA
+                                </button>
+                                <button onclick="selectMainCategory('Matematika')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="Matematika">
+                                    Matematika
+                                </button>
+                                <button onclick="selectMainCategory('Bahasa Indonesia')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="Bahasa Indonesia">
+                                    Bahasa Indonesia
+                                </button>
+                                <button onclick="selectMainCategory('Bahasa Inggris')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="Bahasa Inggris">
+                                    Bahasa Inggris
+                                </button>
+                                <button onclick="selectMainCategory('PPKN')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="PPKN">
+                                    PPKN
+                                </button>
+                                <button onclick="selectMainCategory('IPS')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="IPS">
+                                    IPS
+                                </button>
+                                <button onclick="selectMainCategory('IPAS')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="IPAS">
+                                    IPAS
+                                </button>
+                                <button onclick="selectMainCategory('Seni Musik')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0" data-category="Seni Musik">
+                                    Seni Musik
+                                </button>
+                                <button onclick="selectMainCategory('Kejuruan')" class="pill-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-500/80 hover:bg-emerald-500 text-white backdrop-blur-md flex-shrink-0" data-category="Kejuruan">
+                                    🛠️ Kejuruan
+                                </button>
+                            </div>
+
+                            <!-- Tombol Panah Geser Kanan -->
+                            <button 
+                                type="button" 
+                                onclick="scrollCategories(180)" 
+                                aria-label="Geser kategori ke kanan"
+                                class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-blue-950/70 hover:bg-blue-900 text-white backdrop-blur-md border border-white/20 ml-1.5 flex-shrink-0 transition shadow-sm hover:scale-105 active:scale-95 z-10"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tingkat 2: Sub-Filter Kaskade Dinamis (Muncul Berdasarkan Kategori Utama yang Dipilih) -->
+                    <div id="cascadeSubFilterBox" class="hidden pt-2 border-t border-white/20 animate-fade-in">
+                        
+                        <!-- Kondisi A: Jika Mapel Umum dipilih -> Dropdown Tingkat Kelas -->
+                        <div id="subFilterClassContainer" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <label for="subFilterClassSelect" class="text-xs font-bold text-amber-300 flex items-center">
+                                <span class="mr-1">🎯</span> Saring Berdasarkan Tingkat Kelas:
+                            </label>
+                            <select 
+                                id="subFilterClassSelect" 
+                                onchange="filterAndRenderBooks()" 
+                                class="px-3 py-1.5 bg-white text-slate-800 rounded-xl text-xs font-bold focus:ring-2 focus:ring-amber-400 focus:outline-none"
+                            >
+                                <option value="ALL">-- Semua Tingkat Kelas --</option>
+                                <option value="Kelas X">Kelas X (Sepuluh)</option>
+                                <option value="Kelas XI">Kelas XI (Sebelas)</option>
+                                <option value="Kelas XII">Kelas XII (Dua Belas)</option>
+                            </select>
+                        </div>
+
+                        <!-- Kondisi B: Jika "Kejuruan" dipilih -> Dropdown 8 Jurusan Resmi SMKN 1 Sorong -->
+                        <div id="subFilterMajorContainer" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <label for="subFilterMajorSelect" class="text-xs font-bold text-emerald-300 flex items-center">
+                                <span class="mr-1">🛠️</span> Saring 8 Jurusan Resmi SMKN 1 Sorong:
+                            </label>
+                            <select 
+                                id="subFilterMajorSelect" 
+                                onchange="filterAndRenderBooks()" 
+                                class="px-3 py-1.5 bg-white text-slate-800 rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-400 focus:outline-none max-w-full sm:max-w-xs"
+                            >
+                                <option value="ALL">-- Seluruh Jurusan Kejuruan --</option>
+                                <option value="RPL">1. RPL (Rekayasa Perangkat Lunak)</option>
+                                <option value="TJKT">2. TJKT (Teknik Jaringan Komputer & Telko)</option>
+                                <option value="DKV">3. DKV (Desain Komunikasi Visual)</option>
+                                <option value="MPLB">4. MPLB (Manajemen Perkantoran)</option>
+                                <option value="AKL">5. AKL (Akuntansi & Keuangan Lembaga)</option>
+                                <option value="TPMG">6. TPMG (Teknik Perminyakan & Gas)</option>
+                                <option value="GP">7. GP (Geologi Pertambangan)</option>
+                                <option value="TET">8. TET (Teknik Energi Terbarukan)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         3. KONTEN UTAMA: CAROUSEL TKA & GRID KATALOG BUKU
+         ========================================================================= -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-10">
+
+        <!-- Banner Peringatan Konfigurasi -->
+        <div id="configWarningBanner" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+            <span class="font-bold">⚠️ Perhatian:</span> File <code class="font-mono bg-amber-100 px-1 rounded">js/config.js</code> belum lengkap.
+        </div>
+
+        <!-- EFEK SHIMMER / SKELETON LOADER SAAT MEMUAT DATA -->
+        <div id="loadingSkeleton" class="space-y-6">
+            <div class="h-6 bg-slate-200 rounded-lg w-48 animate-pulse"></div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="aspect-[3/4] bg-slate-200 rounded-2xl animate-pulse"></div>
+                <div class="aspect-[3/4] bg-slate-200 rounded-2xl animate-pulse"></div>
+                <div class="aspect-[3/4] bg-slate-200 rounded-2xl animate-pulse hidden sm:block"></div>
+                <div class="aspect-[3/4] bg-slate-200 rounded-2xl animate-pulse hidden sm:block"></div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             SECTION 1: KOLEKSI TKA (SLIDER / CAROUSEL HORIZONTAL SWIPE 3:4)
+             ===================================================================== -->
+        <section id="tkaSection" class="hidden space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl sm:text-2xl animate-bounce">🔥</span>
+                        <h2 class="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                            Koleksi TKA Paling Dicari
+                        </h2>
+                        <span class="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-amber-300">
+                            Top Read
+                        </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                        Geser horizontal untuk melihat bank soal Tes Kemampuan Akademik terpopuler.
+                    </p>
+                </div>
+
+                <!-- Tombol Navigasi Slider di PC -->
+                <div class="hidden sm:flex items-center space-x-1.5">
+                    <button id="sliderPrevBtn" class="w-8 h-8 rounded-full bg-white hover:bg-blue-50 border border-slate-300 text-slate-700 shadow-xs flex items-center justify-center font-bold text-sm transition" title="Geser Kiri">
+                        &larr;
+                    </button>
+                    <button id="sliderNextBtn" class="w-8 h-8 rounded-full bg-white hover:bg-blue-50 border border-slate-300 text-slate-700 shadow-xs flex items-center justify-center font-bold text-sm transition" title="Geser Kanan">
+                        &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kontainer Carousel Horizontal Swipe -->
+            <div 
+                id="tkaSlider" 
+                class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar gap-3.5 sm:gap-5 pb-3 -mx-3 px-3 sm:mx-0 sm:px-0"
+            >
+                <!-- Kartu Poster TKA Dirender Dinamis -->
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             SECTION 2: KATALOG BUKU PELAJARAN & KEJURUAN (GRID KOMPAK)
+             ===================================================================== -->
+        <section id="generalSection" class="space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📚</span>
+                    <h2 class="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+                        Katalog Buku Pelajaran & Kejuruan
+                    </h2>
+                </div>
+                <span id="generalBookCount" class="text-xs font-bold text-blue-900 bg-blue-50 px-2.5 py-0.5 rounded-full">
+                    0 Buku
+                </span>
+            </div>
+
+            <!-- Grid 2 Kolom di HP (360px) & 4-5 Kolom di PC -->
+            <div 
+                id="generalGrid" 
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4.5"
+            >
+                <!-- Kartu Buku Reguler Dirender Dinamis -->
+            </div>
+        </section>
+
+        <!-- Tampilan Kosong Jika Tidak Ada Buku Cocok -->
+        <div id="emptyState" class="hidden py-16 text-center bg-white rounded-3xl border border-slate-200 p-8">
+            <div class="text-4xl mb-2">🔍</div>
+            <h3 class="text-sm sm:text-base font-extrabold text-slate-800">Tidak ada buku yang sesuai</h3>
+            <p class="text-xs text-slate-500 mt-1">Coba sesuaikan kata kunci pencarian atau ubah pilihan kategori.</p>
+        </div>
+
+    </main>
+
+    <!-- =========================================================================
+         4. MODAL FORMULIR PEMINJAMAN GLASSMORPHISM & 8 JURUSAN RESMI
+         ========================================================================= -->
+    <div id="borrowModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="glass-modal rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-white/50 my-6 transition-all transform scale-100">
+            
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">📖</span>
+                    <div>
+                        <h3 class="font-extrabold text-sm sm:text-base leading-tight">Formulir Peminjaman Buku</h3>
+                        <p class="text-[10px] sm:text-xs text-blue-200">Perpustakaan Digital SMKN 1 Sorong</p>
+                    </div>
+                </div>
+                <button type="button" id="closeBorrowModalBtn" class="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-blue-800/60 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Ringkasan Buku Terpilih -->
+            <div class="bg-blue-50/70 p-3 sm:p-4 border-b border-blue-100 flex items-start space-x-3">
+                <div id="modalBookCoverContainer" class="w-12 h-16 bg-blue-950 rounded-lg overflow-hidden flex-shrink-0 shadow-xs border border-slate-200 flex items-center justify-center text-white text-[10px] text-center font-bold">
+                    <!-- Cover atau fallback -->
+                </div>
+                <div class="flex-grow min-w-0">
+                    <span id="modalBookCategoryBadge" class="inline-block text-[9px] font-extrabold text-blue-800 uppercase tracking-wide bg-blue-100 px-2 py-0.5 rounded">
+                        Kategori
+                    </span>
+                    <h4 id="modalBookTitle" class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug mt-0.5 truncate">
+                        Judul Buku
+                    </h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5 truncate">
+                        Penulis: <span id="modalBookAuthor" class="font-medium text-slate-700">-</span>
+                    </p>
+                    <p class="text-[11px] text-emerald-700 font-bold mt-0.5">
+                        Tersedia: <span id="modalBookStock">-</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Form Data Lengkap Siswa -->
+            <form id="borrowForm" class="p-4 sm:p-5 space-y-3 text-xs">
+                <input type="hidden" id="modalBookId">
+
+                <!-- Nama Lengkap & NIS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label for="studentNameInput" class="block font-bold text-slate-700 mb-1">
+                            Nama Lengkap Siswa <span class="text-rose-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="studentNameInput" 
+                            required 
+                            placeholder="Contoh: Muhammad Al-Fatih" 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                        >
+                    </div>
+                    <div>
+                        <label for="studentNisInput" class="block font-bold text-slate-700 mb-1">
+                            NIS (Nomor Induk Siswa) <span class="text-rose-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="studentNisInput" 
+                            required 
+                            placeholder="Contoh: 202410123" 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                        >
+                    </div>
+                </div>
+
+                <!-- Tingkat Kelas & 8 Jurusan Resmi SMKN 1 Sorong -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label for="studentClassInput" class="block font-bold text-slate-700 mb-1">
+                            Tingkat Kelas <span class="text-rose-500">*</span>
+                        </label>
+                        <select 
+                            id="studentClassInput" 
+                            required 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                        >
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="Kelas X">Kelas X (Sepuluh)</option>
+                            <option value="Kelas XI">Kelas XI (Sebelas)</option>
+                            <option value="Kelas XII">Kelas XII (Dua Belas)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="studentMajorInput" class="block font-bold text-slate-700 mb-1">
+                            Jurusan Resmi SMKN 1 Sorong <span class="text-rose-500">*</span>
+                        </label>
+                        <select 
+                            id="studentMajorInput" 
+                            required 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition font-medium"
+                        >
+                            <option value="">-- Pilih 8 Jurusan --</option>
+                            <option value="RPL (Rekayasa Perangkat Lunak)">1. RPL (Rekayasa Perangkat Lunak)</option>
+                            <option value="TJKT (Teknik Jaringan Komputer dan Telekomunikasi)">2. TJKT (Teknik Jaringan Komputer & Telko)</option>
+                            <option value="DKV (Desain Komunikasi Visual)">3. DKV (Desain Komunikasi Visual)</option>
+                            <option value="MPLB (Manajemen Perkantoran dan Layanan Bisnis)">4. MPLB (Manajemen Perkantoran & Bisnis)</option>
+                            <option value="AKL (Akuntansi dan Keuangan Lembaga)">5. AKL (Akuntansi & Keuangan Lembaga)</option>
+                            <option value="TPMG (Teknik Pengolahan Minyak dan Gas)">6. TPMG (Teknik Pengolahan Minyak & Gas)</option>
+                            <option value="GP (Geologi Pertambangan)">7. GP (Geologi Pertambangan)</option>
+                            <option value="TET (Teknik Energi Terbarukan)">8. TET (Teknik Energi Terbarukan)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Nomor WhatsApp -->
+                <div>
+                    <label for="studentPhoneInput" class="block font-bold text-slate-700 mb-1">
+                        Nomor WhatsApp Aktif Siswa <span class="text-rose-500">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="studentPhoneInput" 
+                        required 
+                        placeholder="Contoh: 081234567890 (Untuk pengingat pengembalian)" 
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                    >
+                </div>
+
+                <!-- Jumlah Buku yang Dipinjam -->
+                <div>
+                    <label for="borrowQuantityInput" class="block font-bold text-slate-700 mb-1">
+                        Jumlah Buku yang Dipinjam <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" id="decreaseQtyBtn"
+                            class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-100 text-rose-700 font-extrabold text-lg border border-slate-200 flex items-center justify-center transition flex-shrink-0">
+                            −
+                        </button>
+                        <input
+                            type="number"
+                            id="borrowQuantityInput"
+                            min="1"
+                            max="3"
+                            value="1"
+                            required
+                            class="w-full text-center px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 font-extrabold text-lg transition"
+                        >
+                        <button type="button" id="increaseQtyBtn"
+                            class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-emerald-100 text-emerald-700 font-extrabold text-lg border border-slate-200 flex items-center justify-center transition flex-shrink-0">
+                            +
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-1">Maksimal <strong>3 buku</strong> per peminjaman. Stok akan dikurangi sesuai jumlah.</p>
+                </div>
+
+                <!-- Pilihan Tipe Durasi Peminjaman -->
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-700">
+                        Pilihan Durasi Layanan Peminjaman <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center p-2.5 rounded-xl border-2 border-blue-900 bg-blue-50/70 cursor-pointer transition relative" id="borrowTypeRegularCard">
+                            <input type="radio" name="borrowType" value="regular" checked class="mr-2 text-blue-900 focus:ring-blue-600 cursor-pointer">
+                            <div>
+                                <div class="font-extrabold text-blue-950 text-[11px] sm:text-xs">📌 Reguler (7 Hari)</div>
+                                <div class="text-[10px] text-slate-500">Bawa pulang belajar mandiri</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-2.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-amber-50 cursor-pointer transition relative" id="borrowTypeHourlyCard">
+                            <input type="radio" name="borrowType" value="hourly" class="mr-2 text-amber-600 focus:ring-amber-500 cursor-pointer">
+                            <div>
+                                <div class="font-extrabold text-amber-950 text-[11px] sm:text-xs">⚡ Jam Pelajaran</div>
+                                <div class="text-[10px] text-slate-500">Hari ini (07:30 - 14:45 WIT)</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Bagian Waktu Jam Pelajaran (Muncul saat Jam Pelajaran dipilih) -->
+                <div id="hourlyTimeContainer" class="hidden bg-amber-50/80 border border-amber-200 rounded-2xl p-3 space-y-2 animate-fade-in">
+                    <div class="flex items-center justify-between text-amber-900 text-[11px]">
+                        <span class="font-extrabold flex items-center">
+                            <span class="mr-1">🕒</span> Jam Operasional Layanan Sekolah:
+                        </span>
+                        <span class="bg-amber-200/80 px-2 py-0.5 rounded font-mono font-black text-[10px] text-amber-950">07:30 - 14:45 WIT</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="borrowStartTime" class="block font-bold text-amber-950 text-[10px] mb-0.5">Jam Mulai</label>
+                            <input type="time" id="borrowStartTime" min="07:30" max="14:45" value="07:30" class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <div>
+                            <label for="borrowEndTime" class="block font-bold text-amber-950 text-[10px] mb-0.5">Batas Pengembalian</label>
+                            <input type="time" id="borrowEndTime" min="07:30" max="14:45" value="14:45" class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-amber-500">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-amber-800 leading-tight">
+                        Wajib dikembalikan sebelum pukul <strong>14:45 WIT</strong> hari ini saat jam kepulangan siswa SMKN 1 Sorong.
+                    </p>
+                </div>
+
+                <!-- Tanggal Pinjam & Jatuh Tempo -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label for="borrowDateInput" class="block font-bold text-slate-700 mb-1">Tgl Pinjam</label>
+                        <input type="date" id="borrowDateInput" required class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 transition">
+                    </div>
+                    <div>
+                        <label for="dueDateInput" id="dueDateLabel" class="block font-bold text-slate-700 mb-1">Tenggat (+7 Hari)</label>
+                        <input type="date" id="dueDateInput" readonly class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 font-bold cursor-not-allowed">
+                    </div>
+                </div>
+
+                <!-- KODE OTORISASI PETUGAS / ADMIN (KIOS ANJUNGAN PERPUS) -->
+                <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-3 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label for="adminAuthCodeInput" class="block font-bold text-slate-800 text-[11px] sm:text-xs">
+                            🔑 Kode Verifikasi Petugas / Admin <span class="text-rose-500">*</span>
+                        </label>
+                        <span id="codeValidationBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
+                    </div>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="adminAuthCodeInput" 
+                            required 
+                            autocomplete="off"
+                            placeholder="Minta kode verifikasi ke petugas..." 
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 uppercase tracking-widest font-mono text-xs font-bold transition pr-10"
+                        >
+                        <button 
+                            type="button" 
+                            id="toggleCodeVisibilityBtn" 
+                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                            title="Tampilkan / Sembunyikan Kode"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 flex items-center">
+                        <span class="mr-1">🛡️</span> Siswa wajib diverifikasi oleh petugas jaga perpustakaan sebelum konfirmasi peminjaman.
+                    </p>
+                </div>
+
+                <!-- KOTAK PERINGATAN DENDA KETERLAMBATAN -->
+                <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3 space-y-2">
+                    <div class="flex items-start space-x-2 text-rose-900">
+                        <span class="text-base flex-shrink-0">⚠️</span>
+                        <div class="leading-relaxed">
+                            <strong class="font-extrabold text-rose-950 text-[11px]">ATURAN DENDA KETERLAMBATAN:</strong>
+                            <p class="text-[10px] text-rose-800 mt-0.5">
+                                Keterlambatan pengembalian buku dikenakan <strong>DENDA Rp15.000,- per buku</strong>. Harap kembalikan tepat waktu.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2 border-t border-rose-200 flex items-start space-x-2">
+                        <input 
+                            type="checkbox" 
+                            id="agreeFineCheckbox" 
+                            required 
+                            class="w-4 h-4 mt-0.5 text-rose-600 rounded border-rose-300 focus:ring-rose-500 cursor-pointer"
+                        >
+                        <label for="agreeFineCheckbox" class="font-bold text-[10px] sm:text-[11px] text-rose-950 cursor-pointer select-none">
+                            Saya membaca dan MENYETUJUI aturan denda keterlambatan Rp15.000,- tersebut. <span class="text-rose-600">*</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Tombol Aksi Modal -->
+                <div class="pt-2 flex items-center justify-end space-x-2">
+                    <button 
+                        type="button" 
+                        id="cancelBorrowBtn" 
+                        class="px-4 py-2 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
+                    >
+                        Batal
+                    </button>
+                    <button 
+                        type="submit" 
+                        id="submitBorrowBtn" 
+                        disabled 
+                        class="inline-flex items-center px-4 py-2 rounded-xl font-bold text-white bg-blue-900 hover:bg-blue-800 shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <span id="submitBorrowSpinner" class="hidden animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent mr-1.5"></span>
+                        <span id="submitBorrowText">Konfirmasi & Pinjam</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL PANDUAN PEMINJAMAN KIOS KOMPUTER PERPUSTAKAAN
+         ========================================================================= -->
+    <div id="kioskGuideModal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="glass-modal rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-white/50 my-6 transition-all transform scale-100">
+            
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                    <span class="text-2xl">❓</span>
+                    <div>
+                        <h3 class="font-extrabold text-sm sm:text-base leading-tight">Panduan Peminjaman Kios</h3>
+                        <p class="text-[10px] sm:text-xs text-blue-200">Anjungan Mandiri Perpustakaan Digital SMKN 1 Sorong</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeKioskGuideModal()" class="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-blue-800/60 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- 3 Langkah Panduan -->
+            <div class="p-4 sm:p-6 space-y-4 text-xs">
+                
+                <!-- Langkah 1 -->
+                <div class="flex items-start space-x-3 p-3 bg-blue-50/70 border border-blue-100 rounded-2xl">
+                    <div class="w-8 h-8 rounded-xl bg-blue-900 text-white flex items-center justify-center font-black text-sm flex-shrink-0 shadow-xs">
+                        1
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-blue-950 text-xs sm:text-sm">Pilih Buku & Klik "Pinjam"</h4>
+                        <p class="text-slate-600 text-[11px] mt-0.5 leading-relaxed">
+                            Gunakan kotak pencarian atau pill filter untuk menemukan buku Mapel Umum, Koleksi HOTS TKA, maupun 8 Jurusan Vokasi resmi. Klik tombol <strong>"Pinjam"</strong> pada kartu buku yang tersedia.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Langkah 2 -->
+                <div class="flex items-start space-x-3 p-3 bg-amber-50/70 border border-amber-200 rounded-2xl">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500 text-blue-950 flex items-center justify-center font-black text-sm flex-shrink-0 shadow-xs">
+                        2
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-amber-950 text-xs sm:text-sm">Tentukan Durasi & Minta Kode Petugas</h4>
+                        <p class="text-slate-700 text-[11px] mt-0.5 leading-relaxed">
+                            Pilih jenis durasi: <strong>📌 Reguler (7 Hari)</strong> untuk dibawa pulang atau <strong>⚡ Jam Pelajaran (07:30 - 14:45 WIT)</strong> untuk dibaca hari ini. Datangi petugas jaga di meja konter untuk meminta <strong>Kode Verifikasi Kios</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Langkah 3 -->
+                <div class="flex items-start space-x-3 p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm flex-shrink-0 shadow-xs">
+                        3
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-emerald-950 text-xs sm:text-sm">Verifikasi Kode & Ambil Buku Fisik</h4>
+                        <p class="text-slate-600 text-[11px] mt-0.5 leading-relaxed">
+                            Ketik kode verifikasi dari petugas, centang persetujuan denda Rp15.000,-, lalu klik <strong>"Konfirmasi & Pinjam"</strong>. Setelah sukses berbunyi chime kios, tunjukkan layar ke petugas untuk mengambil buku fisik atau membaca modul digital.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Box Aturan Jam & Denda -->
+                <div class="p-3 bg-slate-100 rounded-2xl border border-slate-200 text-slate-600 text-[10px] space-y-1">
+                    <p class="font-bold text-slate-800">📌 Hal Penting yang Perlu Diingat:</p>
+                    <p>• Peminjaman Jam Pelajaran wajib dikembalikan sebelum pukul <strong>14:45 WIT</strong>.</p>
+                    <p>• Keterlambatan pengembalian buku dikenakan denda wajib <strong>Rp15.000,- per buku</strong>.</p>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button 
+                        type="button" 
+                        onclick="closeKioskGuideModal()" 
+                        class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-white bg-blue-900 hover:bg-blue-800 transition text-xs shadow-sm"
+                    >
+                        Saya Mengerti, Mulai Pinjam
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MODAL PRATINJAU BACA E-BOOK / MODUL PDF (IFRAME VIEWER)
+         ========================================================================= -->
+    <div id="ebookViewerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-2xl sm:rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200">
+            
+            <!-- Header Modal PDF -->
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-2 min-w-0">
+                    <span class="text-lg flex-shrink-0">📖</span>
+                    <div class="min-w-0">
+                        <h3 class="font-extrabold text-sm sm:text-base leading-tight truncate" id="ebookViewerTitle">E-Book Viewer</h3>
+                        <p class="text-[10px] sm:text-xs text-blue-200">Perpustakaan Digital SMKN 1 Sorong</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <!-- Tombol buka di tab baru -->
+                    <a 
+                        id="ebookOpenNewTabBtn" 
+                        href="#" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/20 hover:bg-white/30 text-white transition"
+                        title="Buka di Tab Baru"
+                    >
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        <span class="hidden sm:inline">Tab Baru</span>
+                    </a>
+                    <!-- Tombol unduh langsung -->
+                    <a 
+                        id="ebookDownloadBtn" 
+                        href="#" 
+                        download 
+                        class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/20 hover:bg-white/30 text-white transition"
+                        title="Unduh File E-Book"
+                    >
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span class="hidden sm:inline">Unduh</span>
+                    </a>
+                    <!-- Tombol tutup -->
+                    <button type="button" onclick="closeEbookViewerModal()" class="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-blue-800/60 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Konten PDF / Iframe Viewer -->
+            <div class="flex-grow bg-slate-200 relative overflow-hidden">
+                <!-- Loading Spinner untuk Iframe -->
+                <div id="ebookLoadingIndicator" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 z-10">
+                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-3"></div>
+                    <p class="text-xs font-bold text-slate-500">Memuat dokumen E-Book...</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Jika tidak tampil, coba klik "Tab Baru" di atas</p>
+                </div>
+                <!-- Iframe Viewer -->
+                <iframe 
+                    id="ebookViewerIframe" 
+                    src="about:blank" 
+                    class="w-full h-full border-0"
+                    onload="document.getElementById('ebookLoadingIndicator')?.classList.add('hidden');"
+                    allow="autoplay"
+                ></iframe>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi Feedback -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 hidden max-w-sm w-full p-4 rounded-2xl shadow-2xl border flex items-center space-x-3 transition-all duration-300">
+        <span id="toastIcon" class="text-2xl flex-shrink-0">✅</span>
+        <div class="flex-grow min-w-0">
+            <h4 id="toastTitle" class="text-xs font-bold leading-tight text-slate-900">Notifikasi</h4>
+            <p id="toastMessage" class="text-xs text-slate-600 mt-0.5 truncate">Pesan feedback.</p>
+        </div>
+        <button id="closeToastBtn" class="text-slate-400 hover:text-slate-600 p-1 text-sm font-bold">✕</button>
+    </div>
+
+    <!-- =========================================================================
+         5. SECTION PROFIL & LOKASI GOOGLE MAPS SMKN 1 SORONG (FOOTER LENGKAP)
+         ========================================================================= -->
+    <footer id="profilLokasiSection" class="bg-slate-900 text-slate-300 pt-12 pb-8 px-4 sm:px-6 lg:px-8 border-t border-slate-800 mt-auto scroll-mt-20">
+        <div class="max-w-7xl mx-auto space-y-10">
+            
+            <!-- Grid Profil Sekolah, Visi Perpustakaan, & Jam Operasional -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
+                <!-- Kolom 1: Profil & Identitas Sekolah -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <img 
+                            src="assets/logo-smk1sorong.png" 
+                            alt="Logo SMKN 1 Sorong" 
+                            onerror="this.onerror=null; this.src='assets/logo-smkn1sorong.png';" 
+                            class="w-11 h-11 object-contain rounded-xl p-0.5 bg-white border border-slate-700"
+                        >
+                        <div>
+                            <h3 class="text-base font-black text-white tracking-wide">
+                                PERPUSTAKAAN DIGITAL SMKN 1 SORONG
+                            </h3>
+                            <p class="text-xs text-blue-400 font-semibold">
+                                Pusat Referensi Vokasi & Inovasi Teknologi
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-slate-300">
+                        <p class="flex items-start space-x-2">
+                            <span class="text-blue-400 font-bold flex-shrink-0">📍 Alamat:</span>
+                            <span>Jl. Pendidikan No. 1, Kelurahan Remu Utara, Distrik Sorong, Kota Sorong, Papua Barat Daya 98412</span>
+                        </p>
+                    </div>
+
+                    <!-- Jam Operasional -->
+                    <div class="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700 space-y-1 text-xs">
+                        <span class="font-bold text-amber-400 flex items-center">
+                            <span class="mr-1.5">🕒</span> Jam Operasional Layanan:
+                        </span>
+                        <p class="text-slate-200 pl-5 font-semibold">Senin &ndash; Sabtu : <strong>07.30 &ndash; 14.45 WIT</strong></p>
+                        <p class="text-slate-400 pl-5 text-[11px]"> Minggu & Hari Libur Nasional : Tutup</p>
+                    </div>
+                </div>
+
+                <!-- Kolom 2: 8 Jurusan Resmi SMKN 1 Sorong -->
+                <div class="md:col-span-3 space-y-3">
+                    <h4 class="text-sm font-extrabold text-white border-b border-slate-800 pb-2">
+                        8 Jurusan Kejuruan Resmi:
+                    </h4>
+                    <ul class="text-[11px] text-slate-400 space-y-1 font-medium">
+                        <li>1. <span class="text-slate-200">RPL</span> (Rekayasa Perangkat Lunak)</li>
+                        <li>2. <span class="text-slate-200">TJKT</span> (Teknik Jaringan Komputer)</li>
+                        <li>3. <span class="text-slate-200">DKV</span> (Desain Komunikasi Visual)</li>
+                        <li>4. <span class="text-slate-200">MPLB</span> (Manajemen Perkantoran)</li>
+                        <li>5. <span class="text-slate-200">AKL</span> (Akuntansi Keuangan)</li>
+                        <li>6. <span class="text-slate-200">TPMG</span> (Perminyakan & Gas)</li>
+                        <li>7. <span class="text-slate-200">GP</span> (Geologi Pertambangan)</li>
+                        <li>8. <span class="text-slate-200">TET</span> (Teknik Energi Terbarukan)</li>
+                    </ul>
+                </div>
+
+                <!-- Kolom 3: Google Maps Embed Lokasi SMKN 1 Sorong -->
+                <div class="md:col-span-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-extrabold text-white">
+                            Peta Lokasi SMKN 1 Sorong:
+                        </h4>
+                        <a 
+                            href="https://maps.google.com/?q=SMK+Negeri+1+Kota+Sorong" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            class="text-[11px] text-amber-400 hover:text-amber-300 font-bold"
+                        >
+                            Petunjuk Arah &nearr;
+                        </a>
+                    </div>
+                    
+                    <!-- Wadah Peta Embed Interaktif -->
+                    <div class="w-full h-44 rounded-2xl overflow-hidden border border-slate-700 shadow-lg bg-slate-800">
+                        <iframe 
+                            title="Lokasi SMK Negeri 1 Kota Sorong"
+                            src="https://maps.google.com/maps?q=SMK+Negeri+1+Kota+Sorong&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            class="w-full h-full border-0" 
+                            loading="lazy" 
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Baris Bawah Hak Cipta -->
+            <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 text-center sm:text-left">
+                <p>&copy; 2026 Tim Rekayasa Perangkat Lunak (RPL) SMKN 1 Sorong. Seluruh Hak Cipta Dilindungi.</p>
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="hover:text-white transition">Masuk Admin</a>
+                    <span>&bull;</span>
+                    <span>Aturan Denda: Rp15.000,-</span>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- Konfigurasi Supabase & Koleksi Standar -->
+    <script src="js/config.js"></script>
+    <script src="js/placeholder-books.js"></script>
+
+    <!-- LOGIKA JAVASCRIPT LENGKAP -->
+    <script>
+        // =====================================================================
+        // A. VARIABEL GLOBAL & DOM
+        // =====================================================================
+        let supabaseClient = null;
+        let allBooks = [];
+        let activeMainCategory = 'ALL';
+        let toastTimeout = null;
+
+        const connectionBadge = document.getElementById('connectionStatus');
+        const statusIndicatorDot = document.getElementById('statusIndicatorDot');
+        const statusText = document.getElementById('statusText');
+        const configWarningBanner = document.getElementById('configWarningBanner');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const loadingSkeleton = document.getElementById('loadingSkeleton');
+        const emptyState = document.getElementById('emptyState');
+        const activeFilterLabel = document.getElementById('activeFilterLabel');
+
+        // Kaskade Sub-filter
+        const cascadeSubFilterBox = document.getElementById('cascadeSubFilterBox');
+        const subFilterClassContainer = document.getElementById('subFilterClassContainer');
+        const subFilterClassSelect = document.getElementById('subFilterClassSelect');
+        const subFilterMajorContainer = document.getElementById('subFilterMajorContainer');
+        const subFilterMajorSelect = document.getElementById('subFilterMajorSelect');
+
+        // Section Elements
+        const tkaSection = document.getElementById('tkaSection');
+        const tkaSlider = document.getElementById('tkaSlider');
+        const sliderPrevBtn = document.getElementById('sliderPrevBtn');
+        const sliderNextBtn = document.getElementById('sliderNextBtn');
+
+        const generalSection = document.getElementById('generalSection');
+        const generalGrid = document.getElementById('generalGrid');
+        const generalBookCount = document.getElementById('generalBookCount');
+
+        // Modal Elements
+        const borrowModal = document.getElementById('borrowModal');
+        const closeBorrowModalBtn = document.getElementById('closeBorrowModalBtn');
+        const cancelBorrowBtn = document.getElementById('cancelBorrowBtn');
+        const borrowForm = document.getElementById('borrowForm');
+        const modalBookId = document.getElementById('modalBookId');
+        const modalBookCoverContainer = document.getElementById('modalBookCoverContainer');
+        const modalBookTitle = document.getElementById('modalBookTitle');
+        const modalBookAuthor = document.getElementById('modalBookAuthor');
+        const modalBookCategoryBadge = document.getElementById('modalBookCategoryBadge');
+        const modalBookStock = document.getElementById('modalBookStock');
+
+        const studentNameInput = document.getElementById('studentNameInput');
+        const studentNisInput = document.getElementById('studentNisInput');
+        const studentClassInput = document.getElementById('studentClassInput');
+        const studentMajorInput = document.getElementById('studentMajorInput');
+        const studentPhoneInput = document.getElementById('studentPhoneInput');
+        const borrowDateInput = document.getElementById('borrowDateInput');
+        const dueDateInput = document.getElementById('dueDateInput');
+        const adminAuthCodeInput = document.getElementById('adminAuthCodeInput');
+        const codeValidationBadge = document.getElementById('codeValidationBadge');
+        const toggleCodeVisibilityBtn = document.getElementById('toggleCodeVisibilityBtn');
+        const agreeFineCheckbox = document.getElementById('agreeFineCheckbox');
+        const submitBorrowBtn = document.getElementById('submitBorrowBtn');
+        const submitBorrowSpinner = document.getElementById('submitBorrowSpinner');
+        const submitBorrowText = document.getElementById('submitBorrowText');
+
+        // Elemen Jumlah Buku (Quantity)
+        const borrowQuantityInput = document.getElementById('borrowQuantityInput');
+        const decreaseQtyBtn = document.getElementById('decreaseQtyBtn');
+        const increaseQtyBtn = document.getElementById('increaseQtyBtn');
+
+        // Elemen Durasi Kios & Jam Pelajaran
+        const borrowTypeRadios = document.querySelectorAll('input[name="borrowType"]');
+        const borrowTypeRegularCard = document.getElementById('borrowTypeRegularCard');
+        const borrowTypeHourlyCard = document.getElementById('borrowTypeHourlyCard');
+        const hourlyTimeContainer = document.getElementById('hourlyTimeContainer');
+        const borrowStartTime = document.getElementById('borrowStartTime');
+        const borrowEndTime = document.getElementById('borrowEndTime');
+        const dueDateLabel = document.getElementById('dueDateLabel');
+        const kioskGuideModal = document.getElementById('kioskGuideModal');
+
+        // =====================================================================
+        // AUDIO FEEDBACK INTERAKTIF KIOS (WEB AUDIO API MURNI)
+        // =====================================================================
+        const SoundFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        this.ctx = new AudioContext();
+                    }
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playClick() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.05);
+                } catch(e) {}
+            },
+            playCodeSuccess() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    // Chime ceria C5 - E5 - G5
+                    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.15);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.15);
+                    });
+                } catch(e) {}
+            },
+            playBorrowSuccess() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    // Fanfare sukses A4 - C#5 - E5 - A5
+                    [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        gain.gain.setValueAtTime(0.15, now + idx * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.25);
+                    });
+                } catch(e) {}
+            }
+        };
+
+        // Ambil kode verifikasi aktif dari pengaturan Admin atau fallback default
+        function getKioskAuthCode() {
+            return (localStorage.getItem('smkn1_kiosk_auth_code') || (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.adminAuthCode) || 'PERPUS2026').trim().toUpperCase();
+        }
+
+        // =====================================================================
+        // MODAL PANDUAN KIOS
+        // =====================================================================
+        window.openKioskGuideModal = function() {
+            SoundFX.playClick();
+            if (kioskGuideModal) kioskGuideModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeKioskGuideModal = function() {
+            SoundFX.playClick();
+            if (kioskGuideModal) kioskGuideModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        if (kioskGuideModal) {
+            kioskGuideModal.addEventListener('click', (e) => {
+                if (e.target === kioskGuideModal) closeKioskGuideModal();
+            });
+        }
+
+        // Toast Elements
+        const toastNotification = document.getElementById('toastNotification');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const closeToastBtn = document.getElementById('closeToastBtn');
+
+        // =====================================================================
+        // B. FUNGSI SANITASI XSS & TOAST
+        // =====================================================================
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function sanitizeUrl(url) {
+            if (!url) return '';
+            const trimmed = String(url).trim();
+            if (trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('data:image/')) {
+                return escapeHtml(trimmed);
+            }
+            return '';
+        }
+
+        function showToast(type, title, message) {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastNotification.className = "fixed bottom-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl shadow-2xl border flex items-center space-x-3 transition-all duration-300";
+
+            if (type === 'success') {
+                toastNotification.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-950');
+                toastIcon.textContent = '✅';
+            } else if (type === 'error') {
+                toastNotification.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-950');
+                toastIcon.textContent = '❌';
+            } else {
+                toastNotification.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-950');
+                toastIcon.textContent = 'ℹ️';
+            }
+
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            toastNotification.classList.remove('hidden');
+
+            toastTimeout = setTimeout(() => {
+                toastNotification.classList.add('hidden');
+            }, 4500);
+        }
+
+        closeToastBtn.addEventListener('click', () => {
+            toastNotification.classList.add('hidden');
+        });
+
+        // =====================================================================
+        // C. WEB NOTIFICATION API
+        // =====================================================================
+        async function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+        }
+
+        function triggerBrowserNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    new Notification(title, {
+                        body: body,
+                        icon: 'assets/logo-smk1sorong.png'
+                    });
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
+        }
+
+        function checkScheduledReminders() {
+            try {
+                const stored = localStorage.getItem('smkn1_borrow_reminders');
+                if (!stored) return;
+                const reminders = JSON.parse(stored);
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                reminders.forEach(item => {
+                    if (item.dueDate === todayStr && !item.alertedHariH) {
+                        triggerBrowserNotification(
+                            "🚨 Hari Ini Batas Pengembalian Buku!",
+                            `Halo ${item.studentName}, batas waktu buku "${item.bookTitle}" habis hari ini. Kembalikan segera agar terhindar denda Rp15.000,-.`
+                        );
+                        item.alertedHariH = true;
+                    }
+                });
+
+                localStorage.setItem('smkn1_borrow_reminders', JSON.stringify(reminders));
+            } catch (err) {
+                console.warn("Gagal cek pengingat:", err);
+            }
+        }
+
+        // =====================================================================
+        // D. INISIALISASI SUPABASE & AMBIL BUKU
+        // =====================================================================
+        function initSupabase() {
+            const isDefault = !SUPABASE_CONFIG.url || SUPABASE_CONFIG.url.includes('your-project-id');
+            if (isDefault) {
+                configWarningBanner.classList.remove('hidden');
+                updateStatusBadge('warning', 'Perlu Setup');
+                loadingSkeleton.classList.add('hidden');
+                return false;
+            }
+
+            try {
+                supabaseClient = window.supabase.createClient(
+                    SUPABASE_CONFIG.url,
+                    SUPABASE_CONFIG.anonKey
+                );
+                return true;
+            } catch (err) {
+                console.error("Supabase inisialisasi gagal:", err);
+                updateStatusBadge('error', 'Koneksi Gagal');
+                return false;
+            }
+        }
+
+        function updateStatusBadge(status, message) {
+            if (!connectionBadge || !statusIndicatorDot || !statusText) return;
+            statusIndicatorDot.className = "w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mr-1.5";
+            if (status === 'connected') {
+                connectionBadge.className = "flex items-center px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs";
+                statusIndicatorDot.className += " bg-emerald-500 animate-pulse";
+                statusText.textContent = message || "Terhubung";
+            } else if (status === 'warning') {
+                connectionBadge.className = "flex items-center px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 shadow-xs";
+                statusIndicatorDot.className += " bg-amber-500 animate-pulse";
+                statusText.textContent = message || "Perlu Setup";
+            } else {
+                connectionBadge.className = "flex items-center px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold bg-rose-50 text-rose-800 border border-rose-300 shadow-xs";
+                statusIndicatorDot.className += " bg-rose-500";
+                statusText.textContent = message || "Terputus";
+            }
+        }
+
+        async function fetchBooks() {
+            loadingSkeleton.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            try {
+                let dbData = [];
+                if (supabaseClient) {
+                    const { data, error } = await supabaseClient
+                        .from('books')
+                        .select('*')
+                        .order('is_tka', { ascending: false })
+                        .order('created_at', { ascending: false });
+
+                    if (!error && Array.isArray(data)) {
+                        dbData = data;
+                        updateStatusBadge('connected', 'Terhubung');
+                    }
+                }
+
+                // Gabungkan data Supabase dengan 33 Buku Standar Lengkap (Mapel Umum, 8 Jurusan, & TKA)
+                let combinedBooks = [...dbData];
+                if (typeof PLACEHOLDER_BOOKS !== 'undefined' && Array.isArray(PLACEHOLDER_BOOKS)) {
+                    const existingTitles = new Set(dbData.map(b => (b.title || '').trim().toLowerCase()));
+                    const extraPlaceholders = PLACEHOLDER_BOOKS.filter(pb => !existingTitles.has((pb.title || '').trim().toLowerCase()));
+                    combinedBooks = [...dbData, ...extraPlaceholders];
+                }
+
+                allBooks = combinedBooks;
+                filterAndRenderBooks();
+
+            } catch (err) {
+                console.error("Gagal mengambil data buku:", err);
+                updateStatusBadge('error', 'Koneksi Gagal');
+                // Fallback darurat jika koneksi gagal tetap menampilkan buku standar
+                if (typeof PLACEHOLDER_BOOKS !== 'undefined' && Array.isArray(PLACEHOLDER_BOOKS)) {
+                    allBooks = [...PLACEHOLDER_BOOKS];
+                    filterAndRenderBooks();
+                }
+            } finally {
+                loadingSkeleton.classList.add('hidden');
+            }
+        }
+
+        // =====================================================================
+        // E. LOGIKA FILTER DINAMIS DUA TINGKAT (KASKADE) & SCROLL KATEGORI
+        // =====================================================================
+        window.scrollCategories = function(distance) {
+            const container = document.getElementById('categoryPillsContainer');
+            if (container) {
+                container.scrollBy({ left: distance, behavior: 'smooth' });
+            }
+        };
+
+        window.selectMainCategory = function(category) {
+            activeMainCategory = category;
+
+            // Update styling tombol pill
+            document.querySelectorAll('.pill-btn').forEach(btn => {
+                if (btn.getAttribute('data-category') === category) {
+                    btn.className = "pill-btn px-3 py-1.5 rounded-full text-xs font-bold transition shadow-sm bg-amber-400 text-blue-950 flex-shrink-0";
+                } else if (btn.getAttribute('data-category') === 'Kejuruan') {
+                    btn.className = "pill-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-500/80 hover:bg-emerald-500 text-white backdrop-blur-md flex-shrink-0";
+                } else {
+                    btn.className = "pill-btn px-3 py-1.5 rounded-full text-xs font-semibold transition bg-white/20 hover:bg-white/30 text-white backdrop-blur-md flex-shrink-0";
+                }
+            });
+
+            // Logika Tingkat 2 (Kaskade Sub-filter)
+            const isGeneralSubject = [
+                'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 
+                'PPKN', 'IPS', 'IPAS', 'Seni Musik'
+            ].includes(category);
+
+            if (isGeneralSubject) {
+                activeFilterLabel.textContent = `Mapel: ${category}`;
+                cascadeSubFilterBox.classList.remove('hidden');
+                subFilterClassContainer.classList.remove('hidden');
+                subFilterMajorContainer.classList.add('hidden');
+                subFilterClassSelect.value = 'ALL';
+            } else if (category === 'Kejuruan') {
+                activeFilterLabel.textContent = `Bidang Kejuruan`;
+                cascadeSubFilterBox.classList.remove('hidden');
+                subFilterClassContainer.classList.add('hidden');
+                subFilterMajorContainer.classList.remove('hidden');
+                subFilterMajorSelect.value = 'ALL';
+            } else {
+                activeFilterLabel.textContent = category === 'TKA' ? 'Khusus Soal TKA' : 'Semua Koleksi';
+                cascadeSubFilterBox.classList.add('hidden');
+                subFilterClassContainer.classList.add('hidden');
+                subFilterMajorContainer.classList.add('hidden');
+            }
+
+            filterAndRenderBooks();
+        };
+
+        function filterAndRenderBooks() {
+            const query = searchInput.value.trim().toLowerCase();
+            clearSearchBtn.classList.toggle('hidden', query === '');
+
+            const selectedClass = subFilterClassSelect.value;
+            const selectedMajor = subFilterMajorSelect.value;
+
+            const filtered = allBooks.filter(book => {
+                const title = (book.title || '').toLowerCase();
+                const author = (book.author || '').toLowerCase();
+                const category = (book.category || '').toLowerCase();
+
+                // 1. Pencarian teks bebas
+                const matchesSearch = title.includes(query) || author.includes(query) || category.includes(query);
+
+                // 2. Kategori Utama
+                let matchesMainCategory = true;
+                if (activeMainCategory === 'TKA') {
+                    matchesMainCategory = (book.is_tka === true) || category.includes('tka');
+                } else if (activeMainCategory === 'Kejuruan') {
+                    // Mencocokkan buku dengan kategori Kejuruan atau nama salah satu 8 jurusan
+                    const jurusanKeywords = ['kejuruan', 'rpl', 'tjkt', 'dkv', 'mplb', 'akl', 'tpmg', 'gp', 'tet', 'produktif'];
+                    matchesMainCategory = jurusanKeywords.some(kw => category.includes(kw) || title.includes(kw));
+                } else if (activeMainCategory !== 'ALL') {
+                    matchesMainCategory = category.includes(activeMainCategory.toLowerCase());
+                }
+
+                // 3. Sub-filter Kaskade
+                let matchesSubFilter = true;
+                if (!cascadeSubFilterBox.classList.contains('hidden')) {
+                    // A. Sub-filter Kelas untuk Mapel Umum
+                    if (!subFilterClassContainer.classList.contains('hidden') && selectedClass !== 'ALL') {
+                        const classClean = selectedClass.toLowerCase(); // misal: "kelas x"
+                        matchesSubFilter = title.includes(classClean) || category.includes(classClean);
+                    }
+                    // B. Sub-filter Jurusan untuk Kejuruan
+                    if (!subFilterMajorContainer.classList.contains('hidden') && selectedMajor !== 'ALL') {
+                        const majorClean = selectedMajor.toLowerCase(); // misal: "rpl"
+                        matchesSubFilter = category.includes(majorClean) || title.includes(majorClean);
+                    }
+                }
+
+                return matchesSearch && matchesMainCategory && matchesSubFilter;
+            });
+
+            renderCatalogSections(filtered);
+        }
+
+        // =====================================================================
+        // F. RENDER KATALOG DENGAN HOVER EFFECT & ANIMASI
+        // =====================================================================
+        function getFallbackPosterHtml(title, author, category) {
+            return `
+                <div class="w-full h-full bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 p-3.5 flex flex-col justify-between text-white relative select-none">
+                    <div class="flex items-center justify-between text-[9px] text-blue-200">
+                        <span class="font-extrabold tracking-wider">SMKN 1 SORONG</span>
+                        <span class="bg-white/20 px-1.5 py-0.5 rounded text-[8px]">${escapeHtml(category)}</span>
+                    </div>
+                    <div class="my-auto text-center py-2">
+                        <span class="text-3xl">📖</span>
+                        <h4 class="font-black text-xs mt-1.5 line-clamp-3 leading-snug">${escapeHtml(title)}</h4>
+                        <p class="text-[10px] text-blue-200 mt-1 line-clamp-1">${escapeHtml(author)}</p>
+                    </div>
+                    <div class="text-[8px] text-blue-300 text-center tracking-widest uppercase">Perpustakaan Digital</div>
+                </div>
+            `;
+        }
+
+        function renderCatalogSections(books) {
+            tkaSlider.innerHTML = '';
+            generalGrid.innerHTML = '';
+
+            if (books.length === 0) {
+                emptyState.classList.remove('hidden');
+                tkaSection.classList.add('hidden');
+                generalSection.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                generalSection.classList.remove('hidden');
+            }
+
+            // Pisahkan buku TKA & Reguler
+            const tkaBooks = books.filter(b => b.is_tka === true || (b.category && b.category.toUpperCase().includes('TKA')));
+            const generalBooks = books.filter(b => !b.is_tka && !(b.category && b.category.toUpperCase().includes('TKA')));
+
+            // 1. Render TKA Slider (Poster 3:4 dengan Animasi & Hover Scale)
+            if (tkaBooks.length > 0) {
+                tkaSection.classList.remove('hidden');
+                tkaBooks.forEach((book, index) => {
+                    const safeId = escapeHtml(book.id);
+                    const safeTitle = escapeHtml(book.title);
+                    const safeAuthor = escapeHtml(book.author);
+                    const safeCategory = escapeHtml(book.category);
+                    const stock = parseInt(book.stock, 10) || 0;
+                    const safeEbookUrl = sanitizeUrl(book.ebook_url);
+                    const coverUrl = sanitizeUrl(book.cover_url);
+
+                    const rankNum = index + 1;
+                    const rankLabel = rankNum <= 3 ? `🏆 #${rankNum} Top TKA` : `#${rankNum} TKA`;
+
+                    let coverElement = '';
+                    if (coverUrl) {
+                        coverElement = `<img src="${coverUrl}" alt="${safeTitle}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.parentElement.innerHTML = getFallbackPosterHtml('${safeTitle.replace(/'/g, "\\'")}', '${safeAuthor.replace(/'/g, "\\'")}', '${safeCategory.replace(/'/g, "\\'")}');">`;
+                    } else {
+                        coverElement = getFallbackPosterHtml(safeTitle, safeAuthor, safeCategory);
+                    }
+
+                    const ebookBtn = safeEbookUrl ? `
+                        <button onclick="openEbookViewerModal('${safeEbookUrl}', '${safeTitle.replace(/'/g, "\\\\'")}')" class="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-md transition flex-shrink-0" title="Baca E-Book / Modul PDF">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </button>
+                    ` : '';
+
+                    const borrowBtn = stock > 0 ? `
+                        <button onclick="openBorrowModal('${safeId}')" class="flex-grow py-2 px-3 rounded-xl text-xs font-black text-blue-950 bg-amber-400 hover:bg-amber-300 shadow-md transition text-center">
+                            Pinjam Buku
+                        </button>
+                    ` : `
+                        <button disabled class="flex-grow py-2 px-3 rounded-xl text-xs font-bold text-slate-400 bg-slate-800/80 cursor-not-allowed text-center">
+                            Stok Habis
+                        </button>
+                    `;
+
+                    const posterCard = document.createElement('div');
+                    posterCard.className = "poster-card group relative w-44 sm:w-52 md:w-56 flex-none snap-start aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border border-slate-700/50 bg-slate-900 hover:scale-105 transition-all duration-300";
+                    posterCard.innerHTML = `
+                        <div class="w-full h-full">
+                            ${coverElement}
+                        </div>
+
+                        <!-- Badge Ranking Emas dengan Efek Pulse -->
+                        <div class="absolute top-2.5 left-2.5 z-10">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-blue-950 shadow-md border border-amber-300 animate-pulse">
+                                ${rankLabel}
+                            </span>
+                        </div>
+
+                        <!-- Overlay Bagian Bawah Gambar -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent flex flex-col justify-end p-3.5 text-white">
+                            <span class="text-[9px] font-bold text-amber-300 uppercase tracking-wider">${safeCategory}</span>
+                            <h3 class="font-black text-xs sm:text-sm leading-snug line-clamp-2 mt-0.5" title="${safeTitle}">
+                                ${safeTitle}
+                            </h3>
+                            <p class="text-[10px] text-slate-300 line-clamp-1 mt-0.5">${safeAuthor}</p>
+                            
+                            <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center space-x-1.5">
+                                ${ebookBtn}
+                                ${borrowBtn}
+                            </div>
+                        </div>
+                    `;
+
+                    tkaSlider.appendChild(posterCard);
+                });
+            } else {
+                tkaSection.classList.add('hidden');
+            }
+
+            // 2. Render Grid Katalog Buku Pelajaran & Kejuruan (Hover Scale 105)
+            generalBookCount.textContent = `${generalBooks.length} Buku`;
+            generalBooks.forEach(book => {
+                const safeId = escapeHtml(book.id);
+                const safeTitle = escapeHtml(book.title);
+                const safeAuthor = escapeHtml(book.author);
+                const safeCategory = escapeHtml(book.category);
+                const stock = parseInt(book.stock, 10) || 0;
+                const safeEbookUrl = sanitizeUrl(book.ebook_url);
+                const coverUrl = sanitizeUrl(book.cover_url);
+
+                let coverElement = '';
+                if (coverUrl) {
+                    coverElement = `<img src="${coverUrl}" alt="${safeTitle}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.parentElement.innerHTML = getFallbackPosterHtml('${safeTitle.replace(/'/g, "\\'")}', '${safeAuthor.replace(/'/g, "\\'")}', '${safeCategory.replace(/'/g, "\\'")}');">`;
+                } else {
+                    coverElement = getFallbackPosterHtml(safeTitle, safeAuthor, safeCategory);
+                }
+
+                const ebookBtn = safeEbookUrl ? `
+                    <button onclick="openEbookViewerModal('${safeEbookUrl}', '${safeTitle.replace(/'/g, "\\\\'")}')" class="p-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition" title="Baca E-Book / Modul PDF">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </button>
+                ` : '';
+
+                const borrowBtn = stock > 0 ? `
+                    <button onclick="openBorrowModal('${safeId}')" class="flex-grow py-1.5 px-2 rounded-xl text-[11px] sm:text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 transition text-center shadow-xs">
+                        Pinjam
+                    </button>
+                ` : `
+                    <button disabled class="flex-grow py-1.5 px-2 rounded-xl text-[11px] sm:text-xs font-bold text-slate-400 bg-slate-200 cursor-not-allowed text-center">
+                        Habis
+                    </button>
+                `;
+
+                const card = document.createElement('div');
+                card.className = "flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:scale-105 transition-all duration-300";
+                card.innerHTML = `
+                    <div class="relative w-full aspect-[3/4] bg-slate-900 overflow-hidden">
+                        <span class="absolute top-2 right-2 z-10 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                            ${safeCategory}
+                        </span>
+                        ${coverElement}
+                    </div>
+
+                    <div class="p-3 flex-grow flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block text-[9px] font-bold ${stock > 0 ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'} px-1.5 py-0.5 rounded">
+                                ${stock > 0 ? `Stok: ${stock}` : 'Habis'}
+                            </span>
+                            <h4 class="font-extrabold text-xs sm:text-sm text-slate-900 leading-snug line-clamp-2 mt-1" title="${safeTitle}">
+                                ${safeTitle}
+                            </h4>
+                            <p class="text-[10px] text-slate-500 line-clamp-1 mt-0.5">${safeAuthor}</p>
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-100 flex items-center space-x-1.5">
+                            ${ebookBtn}
+                            ${borrowBtn}
+                        </div>
+                    </div>
+                `;
+
+                generalGrid.appendChild(card);
+            });
+        }
+
+        // =====================================================================
+        // G. TOMBOL SCROLL SLIDER TKA
+        // =====================================================================
+        sliderPrevBtn.addEventListener('click', () => {
+            tkaSlider.scrollBy({ left: -260, behavior: 'smooth' });
+        });
+
+        sliderNextBtn.addEventListener('click', () => {
+            tkaSlider.scrollBy({ left: 260, behavior: 'smooth' });
+        });
+
+        // =====================================================================
+        // H. LOGIKA MODAL PEMINJAMAN & VALIDASI DENDA RP15.000,-
+        // =====================================================================
+        function formatDateToYYYYMMDD(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function calculateDueDate(borrowDateString) {
+            const date = new Date(borrowDateString);
+            date.setDate(date.getDate() + 7);
+            return formatDateToYYYYMMDD(date);
+        }
+
+        window.openBorrowModal = function(bookId) {
+            SoundFX.playClick();
+            const selectedBook = allBooks.find(b => String(b.id) === String(bookId));
+            if (!selectedBook) return;
+
+            if (selectedBook.stock <= 0) {
+                showToast('error', 'Stok Habis', 'Maaf, stok buku ini sedang habis.');
+                return;
+            }
+
+            modalBookId.value = selectedBook.id;
+            modalBookTitle.textContent = selectedBook.title;
+            modalBookAuthor.textContent = selectedBook.author;
+            modalBookCategoryBadge.textContent = selectedBook.category;
+            modalBookStock.textContent = `${selectedBook.stock} eks.`;
+
+            if (selectedBook.cover_url) {
+                modalBookCoverContainer.innerHTML = `<img src="${sanitizeUrl(selectedBook.cover_url)}" class="w-full h-full object-cover">`;
+            } else {
+                modalBookCoverContainer.innerHTML = `<div class="p-1 leading-none text-[8px]">SMK 1<br>📖</div>`;
+            }
+
+            borrowForm.reset();
+
+            // Reset durasi ke Reguler secara default
+            const regularRadio = document.querySelector('input[name="borrowType"][value="regular"]');
+            if (regularRadio) regularRadio.checked = true;
+
+            const today = new Date();
+            const todayStr = formatDateToYYYYMMDD(today);
+            borrowDateInput.value = todayStr;
+            updateBorrowDurationUI();
+
+            // Reset jumlah buku ke 1
+            if (borrowQuantityInput) borrowQuantityInput.value = 1;
+
+            if (adminAuthCodeInput) {
+                adminAuthCodeInput.value = '';
+                adminAuthCodeInput.type = 'password';
+                delete adminAuthCodeInput.dataset.verified;
+                adminAuthCodeInput.classList.remove('border-emerald-400', 'border-rose-400');
+            }
+            if (codeValidationBadge) codeValidationBadge.classList.add('hidden');
+            if (toggleCodeVisibilityBtn) toggleCodeVisibilityBtn.textContent = '👁️';
+            agreeFineCheckbox.checked = false;
+            submitBorrowBtn.disabled = true;
+
+            borrowModal.classList.remove('hidden');
+            requestNotificationPermission();
+        };
+
+        function updateBorrowDurationUI() {
+            const selectedType = document.querySelector('input[name="borrowType"]:checked')?.value || 'regular';
+            const todayStr = borrowDateInput.value || formatDateToYYYYMMDD(new Date());
+
+            if (selectedType === 'hourly') {
+                if (hourlyTimeContainer) hourlyTimeContainer.classList.remove('hidden');
+                if (dueDateLabel) dueDateLabel.textContent = "Batas Jam Hari Ini (14:45 WIT)";
+                dueDateInput.value = todayStr; // Terkunci pada hari yang sama
+                if (borrowTypeHourlyCard) {
+                    borrowTypeHourlyCard.className = "flex items-center p-2.5 rounded-xl border-2 border-amber-500 bg-amber-50 cursor-pointer transition relative";
+                }
+                if (borrowTypeRegularCard) {
+                    borrowTypeRegularCard.className = "flex items-center p-2.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-blue-50 cursor-pointer transition relative";
+                }
+            } else {
+                if (hourlyTimeContainer) hourlyTimeContainer.classList.add('hidden');
+                if (dueDateLabel) dueDateLabel.textContent = "Tenggat (+7 Hari)";
+                dueDateInput.value = calculateDueDate(todayStr);
+                if (borrowTypeRegularCard) {
+                    borrowTypeRegularCard.className = "flex items-center p-2.5 rounded-xl border-2 border-blue-900 bg-blue-50/70 cursor-pointer transition relative";
+                }
+                if (borrowTypeHourlyCard) {
+                    borrowTypeHourlyCard.className = "flex items-center p-2.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-amber-50 cursor-pointer transition relative";
+                }
+            }
+        }
+
+        // Event listener pergantian durasi peminjaman
+        borrowTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                SoundFX.playClick();
+                updateBorrowDurationUI();
+            });
+        });
+
+        // Event listener tombol jumlah buku (+ dan -)
+        if (decreaseQtyBtn && borrowQuantityInput) {
+            decreaseQtyBtn.addEventListener('click', () => {
+                SoundFX.playClick();
+                const current = parseInt(borrowQuantityInput.value, 10) || 1;
+                if (current > 1) borrowQuantityInput.value = current - 1;
+            });
+        }
+        if (increaseQtyBtn && borrowQuantityInput) {
+            increaseQtyBtn.addEventListener('click', () => {
+                SoundFX.playClick();
+                const current = parseInt(borrowQuantityInput.value, 10) || 1;
+                const max = parseInt(borrowQuantityInput.max, 10) || 3;
+                if (current < max) borrowQuantityInput.value = current + 1;
+            });
+        }
+        // Pastikan nilai qty selalu dalam batas 1–3 jika diketik manual
+        if (borrowQuantityInput) {
+            borrowQuantityInput.addEventListener('change', () => {
+                let val = parseInt(borrowQuantityInput.value, 10) || 1;
+                const max = parseInt(borrowQuantityInput.max, 10) || 3;
+                val = Math.min(Math.max(val, 1), max);
+                borrowQuantityInput.value = val;
+            });
+        }
+
+        function closeBorrowModal() {
+            SoundFX.playClick();
+            borrowModal.classList.add('hidden');
+            borrowForm.reset();
+            if (codeValidationBadge) codeValidationBadge.classList.add('hidden');
+            if (adminAuthCodeInput) {
+                adminAuthCodeInput.value = '';
+                delete adminAuthCodeInput.dataset.verified;
+                adminAuthCodeInput.classList.remove('border-emerald-400', 'border-rose-400');
+            }
+        }
+
+        closeBorrowModalBtn.addEventListener('click', closeBorrowModal);
+        cancelBorrowBtn.addEventListener('click', closeBorrowModal);
+        borrowModal.addEventListener('click', (e) => {
+            if (e.target === borrowModal) closeBorrowModal();
+        });
+
+        borrowDateInput.addEventListener('change', () => {
+            if (borrowDateInput.value) {
+                updateBorrowDurationUI();
+            }
+        });
+
+        // Validasi Kunci: Siswa harus mencentang denda & memasukkan Kode Verifikasi Petugas
+        function checkBorrowFormReady() {
+            const isAgree = agreeFineCheckbox ? agreeFineCheckbox.checked : false;
+            const enteredCode = adminAuthCodeInput ? adminAuthCodeInput.value.trim().toUpperCase() : '';
+            const expectedCode = getKioskAuthCode();
+            const isCodeValid = enteredCode.length > 0 && enteredCode === expectedCode;
+
+            if (codeValidationBadge) {
+                if (enteredCode.length > 0) {
+                    codeValidationBadge.classList.remove('hidden');
+                    if (isCodeValid) {
+                        codeValidationBadge.textContent = "✓ Kode Petugas Valid";
+                        codeValidationBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                        adminAuthCodeInput.classList.remove('border-rose-400');
+                        adminAuthCodeInput.classList.add('border-emerald-400');
+
+                        // Audio chime saat kode berhasil dicocokkan
+                        if (!adminAuthCodeInput.dataset.verified) {
+                            SoundFX.playCodeSuccess();
+                            adminAuthCodeInput.dataset.verified = "1";
+                        }
+                    } else {
+                        delete adminAuthCodeInput.dataset.verified;
+                        codeValidationBadge.textContent = "✕ Kode Belum Sesuai";
+                        codeValidationBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800";
+                        adminAuthCodeInput.classList.remove('border-emerald-400');
+                        adminAuthCodeInput.classList.add('border-rose-400');
+                    }
+                } else {
+                    delete adminAuthCodeInput.dataset.verified;
+                    codeValidationBadge.classList.add('hidden');
+                    adminAuthCodeInput.classList.remove('border-emerald-400', 'border-rose-400');
+                }
+            }
+
+            // Tombol hanya aktif jika persetujuan denda dicentang DAN kode otorisasi benar
+            submitBorrowBtn.disabled = !(isAgree && isCodeValid);
+        }
+
+        agreeFineCheckbox.addEventListener('change', () => {
+            SoundFX.playClick();
+            checkBorrowFormReady();
+        });
+        if (adminAuthCodeInput) {
+            adminAuthCodeInput.addEventListener('input', checkBorrowFormReady);
+        }
+
+        if (toggleCodeVisibilityBtn && adminAuthCodeInput) {
+            toggleCodeVisibilityBtn.addEventListener('click', () => {
+                SoundFX.playClick();
+                if (adminAuthCodeInput.type === 'password') {
+                    adminAuthCodeInput.type = 'text';
+                    toggleCodeVisibilityBtn.textContent = '🔒';
+                } else {
+                    adminAuthCodeInput.type = 'password';
+                    toggleCodeVisibilityBtn.textContent = '👁️';
+                }
+            });
+        }
+
+        // =====================================================================
+        // I. SUBMIT FORM PEMINJAMAN
+        // =====================================================================
+        borrowForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // 0. Validasi jam operasional (07:30 - 14:45 WIT)
+            const now = new Date();
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+            const startMinutes = 7 * 60 + 30;
+            const endMinutes = 14 * 60 + 45;
+            if (nowMinutes < startMinutes || nowMinutes > endMinutes) {
+                showToast('error', 'Jam Layanan', 'Waktu peminjaman telah lewat');
+                return;
+            }
+
+            // 1. Validasi Kode Otorisasi Petugas / Admin
+            const enteredCode = adminAuthCodeInput ? adminAuthCodeInput.value.trim().toUpperCase() : '';
+            const expectedCode = getKioskAuthCode();
+
+            if (enteredCode !== expectedCode) {
+                showToast('error', 'Verifikasi Gagal', 'Kode verifikasi petugas / admin salah! Silakan minta kode kepada penjaga perpustakaan.');
+                if (adminAuthCodeInput) adminAuthCodeInput.focus();
+                return;
+            }
+
+            // 2. Validasi Persetujuan Denda
+            if (!agreeFineCheckbox.checked) {
+                showToast('error', 'Wajib Setuju', 'Harap centang persetujuan denda Rp15.000,-.');
+                return;
+            }
+
+            const bookId = modalBookId.value;
+            const studentName = studentNameInput.value.trim();
+            const studentNis = studentNisInput.value.trim();
+            let studentClass = studentClassInput.value;
+            const studentMajor = studentMajorInput.value;
+            const studentPhone = studentPhoneInput.value.trim();
+            const borrowDate = borrowDateInput.value;
+            const dueDate = dueDateInput.value;
+            const borrowQty = Math.min(Math.max(parseInt(borrowQuantityInput?.value, 10) || 1, 1), 3);
+
+            // Cek Durasi Layanan (Reguler vs Jam Pelajaran)
+            const selectedDuration = document.querySelector('input[name="borrowType"]:checked')?.value || 'regular';
+            if (selectedDuration === 'hourly') {
+                const startTime = document.getElementById('borrowStartTime')?.value || '07:30';
+                const endTime = document.getElementById('borrowEndTime')?.value || '14:45';
+                studentClass = `${studentClass} [⚡ Jam Pelajaran ${startTime}-${endTime} WIT]`;
+            }
+
+            if (!studentName || !studentNis || !studentClass || !studentMajor || !studentPhone) {
+                showToast('error', 'Lengkapi Data', 'Mohon isi seluruh data siswa dan nomor WhatsApp.');
+                return;
+            }
+
+            const currentBook = allBooks.find(b => String(b.id) === String(bookId));
+            if (!currentBook || currentBook.stock <= 0) {
+                showToast('error', 'Habis', 'Stok buku ini sudah habis.');
+                closeBorrowModal();
+                return;
+            }
+
+            // Pastikan stok mencukupi jumlah yang ingin dipinjam
+            if (currentBook.stock < borrowQty) {
+                showToast('error', 'Stok Tidak Cukup', `Stok buku hanya ${currentBook.stock} eks., tidak cukup untuk ${borrowQty} buku.`);
+                return;
+            }
+
+            submitBorrowBtn.disabled = true;
+            submitBorrowSpinner.classList.remove('hidden');
+            submitBorrowText.textContent = "Menyimpan...";
+
+            try {
+                // 1. Simpan peminjaman dengan data 8 jurusan resmi & durasi
+                if (supabaseClient) {
+                    const { error: recordError } = await supabaseClient
+                        .from('borrow_records')
+                        .insert([{
+                            student_name: studentName,
+                            student_nis: studentNis,
+                            student_class: studentClass,
+                            student_major: studentMajor,
+                            student_phone: studentPhone,
+                            agree_fine_penalty: true,
+                            book_id: bookId,
+                            borrow_date: borrowDate,
+                            due_date: dueDate,
+                            status: 'borrowed'
+                        }]);
+
+                    if (recordError) throw recordError;
+
+                    // 2. Kurangi stok sebanyak jumlah buku yang dipinjam (borrowQty)
+                    const newStock = Math.max(0, currentBook.stock - borrowQty);
+                    const { error: stockError } = await supabaseClient
+                        .from('books')
+                        .update({ stock: newStock })
+                        .eq('id', bookId);
+
+                    if (stockError) throw stockError;
+                    currentBook.stock = newStock;
+                } else {
+                    currentBook.stock = Math.max(0, currentBook.stock - borrowQty);
+                }
+
+                // Mainkan audio fanfare keberhasilan peminjaman
+                SoundFX.playBorrowSuccess();
+
+                // 3. Notifikasi Pengingat Lokal (Browser Notification)
+                try {
+                    const existingReminders = JSON.parse(localStorage.getItem('smkn1_borrow_reminders') || '[]');
+                    existingReminders.push({
+                        studentName,
+                        bookTitle: currentBook.title,
+                        dueDate,
+                        status: 'borrowed',
+                        alertedHariH: false
+                    });
+                    localStorage.setItem('smkn1_borrow_reminders', JSON.stringify(existingReminders));
+
+                    triggerBrowserNotification(
+                        "Peminjaman Berhasil - SMKN 1 Sorong",
+                        `${borrowQty} buku "${currentBook.title}" berhasil dipinjam atas nama ${studentName}. Batas kembali: ${dueDate}. Denda: Rp15.000,-.`
+                    );
+                } catch (e) {
+                    console.warn("Storage warning:", e);
+                }
+
+                filterAndRenderBooks();
+                closeBorrowModal();
+
+                showToast(
+                    'success', 
+                    'Peminjaman Berhasil!', 
+                    `${borrowQty} buku berhasil dipinjam oleh ${studentName}! Kembalikan sebelum ${dueDate} agar terhindar denda Rp15.000,-.`
+                );
+
+            } catch (err) {
+                console.error("Kesalahan peminjaman:", err);
+                showToast('error', 'Peminjaman Gagal', err.message);
+            } finally {
+                submitBorrowBtn.disabled = false;
+                submitBorrowSpinner.classList.add('hidden');
+                submitBorrowText.textContent = "Konfirmasi & Pinjam";
+            }
+        });
+
+        // =====================================================================
+        // J. MODAL PRATINJAU BACA E-BOOK / MODUL PDF (IFRAME VIEWER)
+        // =====================================================================
+        window.openEbookViewerModal = function(ebookUrl, bookTitle) {
+            const modal = document.getElementById('ebookViewerModal');
+            const iframe = document.getElementById('ebookViewerIframe');
+            const titleEl = document.getElementById('ebookViewerTitle');
+            const loadingIndicator = document.getElementById('ebookLoadingIndicator');
+            const openNewTabBtn = document.getElementById('ebookOpenNewTabBtn');
+            const downloadBtn = document.getElementById('ebookDownloadBtn');
+
+            if (!modal || !iframe) return;
+
+            // Set judul buku di header modal
+            if (titleEl) titleEl.textContent = bookTitle || 'E-Book Viewer';
+
+            // Tampilkan loading spinner
+            if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+
+            // Set link buka di tab baru dan link unduh
+            if (openNewTabBtn) openNewTabBtn.href = ebookUrl;
+            if (downloadBtn) downloadBtn.href = ebookUrl;
+
+            // Tentukan URL viewer: jika file PDF, gunakan Google Docs Viewer
+            // untuk mendukung tampilan di berbagai browser mobile dan desktop
+            let viewerUrl = ebookUrl;
+            const lowerUrl = ebookUrl.toLowerCase();
+            
+            if (lowerUrl.endsWith('.pdf') || lowerUrl.includes('.pdf')) {
+                // Google Docs Viewer sebagai fallback universal untuk PDF
+                viewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(ebookUrl)}`;
+            }
+            // Jika link Google Drive, konversi ke format preview
+            if (lowerUrl.includes('drive.google.com') && lowerUrl.includes('/file/d/')) {
+                const fileIdMatch = ebookUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (fileIdMatch) {
+                    viewerUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+                }
+            }
+
+            // Muat viewer di dalam iframe
+            iframe.src = viewerUrl;
+
+            // Tampilkan modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeEbookViewerModal = function() {
+            const modal = document.getElementById('ebookViewerModal');
+            const iframe = document.getElementById('ebookViewerIframe');
+
+            if (modal) modal.classList.add('hidden');
+            if (iframe) iframe.src = '';
+            document.body.style.overflow = '';
+        };
+
+        // Tutup modal PDF saat klik area backdrop luar
+        document.getElementById('ebookViewerModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeEbookViewerModal();
+        });
+
+        // Search Input Events
+        searchInput.addEventListener('input', () => filterAndRenderBooks());
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            selectMainCategory('ALL');
+        });
+
+        // Inisialisasi Awal
+        document.addEventListener('DOMContentLoaded', () => {
+            if (initSupabase()) {
+                fetchBooks();
+                checkScheduledReminders();
+            }
+        });
+    </script>
+</body>
+</html>
