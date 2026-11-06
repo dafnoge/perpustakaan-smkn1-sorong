@@ -33,7 +33,7 @@ Aplikasi Web Perpustakaan Digital modern berbasis *Mobile-First*, terintegrasi d
 
 ---
 
-## 🛠️ Teknologi yang Digunakan (Tech Stack)
+## 🛠️ 3. Teknologi yang Digunakan (Tech Stack)
 - **Frontend**: HTML5, Tailwind CSS (Mobile-First Responsive Design)
 - **Backend / BaaS**: Supabase (PostgreSQL Database, Realtime Subscriptions, Row Level Security)
 - **Pustaka Tambahan**: 
@@ -45,22 +45,43 @@ Aplikasi Web Perpustakaan Digital modern berbasis *Mobile-First*, terintegrasi d
 
 ---
 
-## 🌐 3. Tautan Aplikasi Online
+## 🌐 4. Tautan Aplikasi Online
 - **URL Katalog Siswa**: [https://dafnoge.github.io/perpustakaan-smkn1-sorong/](https://dafnoge.github.io/perpustakaan-smkn1-sorong/)
 - **URL Portal Admin**: [https://dafnoge.github.io/perpustakaan-smkn1-sorong/admin.html](https://dafnoge.github.io/perpustakaan-smkn1-sorong/admin.html)
 
 ---
 
-## 📹 4. Video Penjelasan Aplikasi
+## 🔐 5. Akun Demo Pengujian (Demo Credentials)
+
+Untuk mempermudah pengujian oleh Dewan Juri / Panitia, berikut adalah kredensial akses untuk setiap peran:
+
+| Peran (Role) | Halaman Akses | Email / Kredensial | Kata Sandi (Password) | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| **Siswa (Katalog Publik)** | `index.html` | *Tanpa Login Akun* | - | Akses pencarian modul, filter kejuruan, dan baca E-Book |
+| **Otorisasi Kios Siswa** | Modal Form Pinjam | Kode Petugas: `PERPUS2026` | - | Validasi kode kios anti-spam saat siswa meminjam buku |
+| **Admin / Petugas Perpus** | `login.html` | `admin@smkn1sorong.sch.id` | `PerpusSMKN1!2026` | Akses penuh dashboard stok, kirim WA denda, & eksport Excel |
+
+> *Catatan Penguji: Jika Anda menggunakan akun khusus di Supabase Auth Anda, pastikan email dan password pada tabel di atas cocok dengan akun yang terdaftar pada tab Supabase Authentication.*
+
+---
+
+## 🤖 6. Tools AI yang Digunakan
+Sesuai kepatuhan pedoman transparansi lomba, berikut adalah *tools* AI yang digunakan dalam pengembangan:
+- **Google Antigravity AI (Gemini Agentic Coding)**: Pengembangan logika frontend, integrasi Supabase JS SDK, optimasi realtime subscriptions, dan penanganan responsive UI.
+- **Claude / ChatGPT**: Perancangan struktur skema tabel basis data relasional (DDL SQL) dan konseptualisasi alur denda otomatis WhatsApp.
+
+---
+
+## 📹 7. Video Penjelasan Aplikasi
 - **Link Video**: `[Menunggu proses perekaman video demo maksimal 5 menit]`
 - **Catatan Isi Video**: Memuat perkenalan anggota tim, demonstrasi alur siswa di anjungan kios mandiri, verifikasi kode admin, hingga fitur pemicu denda WhatsApp.
 
 ---
 
-## 📊 5. Flyer & Infografis
+## 📊 8. Flyer & Infografis
 - **Status File**: Disimpan pada direktori `documentation/flyer-perpustakaan.png`.
 
 ---
 
-## 📄 6. Dokumentasi Projek & Kebermanfaatan
+## 📄 9. Dokumentasi Projek & Kebermanfaatan
 - **Status File**: Disimpan pada file `documentation/Dokumentasi_Perpustakaan_Digital_SMKN1.pdf`.
