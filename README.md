@@ -1,6 +1,6 @@
 # 📚 Perpustakaan Digital SMKN 1 Sorong
 
-Aplikasi Web Perpustakaan Digital modern berbasis *Mobile-First*, terintegrasi dengan **Supabase Database & Storage**, pengingat WhatsApp denda otomatis, dan katalog khusus **Tes Kemampuan Akademik (TKA) 2026**.
+Aplikasi Web Perpustakaan Digital modern berbasis *Mobile-First*, terintegrasi dengan **Cloud Database Supabase**, sistem anjungan kios mandiri anti-spam, pengingat WhatsApp denda keterlambatan otomatis, dan katalog khusus **Tes Kemampuan Akademik (TKA) 2026**.
 
 ---
 
@@ -11,6 +11,23 @@ Aplikasi Web Perpustakaan Digital modern berbasis *Mobile-First*, terintegrasi d
   1. **Reyhan Daffa Adilla Harahap** (Project Manager / Fullstack Lead)
   2. **Muhammad Ichsan** (UI/UX Designer & Content Specialist)
   3. **Mazmur Novbertman** (QA Tester & Documentation)
+
+---
+
+## 🎯 2. Masalah Nyata & Solusi yang Dihadirkan
+
+### Masalah Nyata di Sekolah (Hasil Wawancara Petugas Perpustakaan):
+1. **Pencatatan Konvensional yang Lambat**: Transaksi peminjaman masih dicatat di buku besar manual, memakan waktu 3–5 menit per siswa dan menimbulkan antrean panjang saat jam istirahat.
+2. **Tingginya Keterlambatan Modul Praktik**: Buku kejuruan memiliki stok fisik terbatas namun sangat krusial untuk praktik bengkel/lab. Siswa kerap lupa tenggat waktu dan petugas kesulitan melacak kontak siswa.
+3. **Ketiadaan Bank Soal TKA Terpusat**: Siswa kelas XII membutuhkan modul latihan Tes Kemampuan Akademik (TKA) untuk persiapan seleksi perguruan tinggi kedinasan/vokasi yang belum terintegrasi.
+4. **Pengecekan Stok Tidak Fleksibel**: Siswa tidak bisa mengecek ketersediaan buku kejuruan dari ponsel sebelum menuju ke perpustakaan.
+
+### Solusi Inovatif Aplikasi:
+- **Anjungan Kios Mandiri (Self-Service)**: Siswa dapat mencari dan meminjam buku secara mandiri di komputer perpustakaan dalam waktu kurang dari 30 detik.
+- **Otorisasi Petugas Kios Anti-Spam**: Tombol konfirmasi pinjam hanya aktif setelah memasukkan kode otorisasi harian dari petugas perpustakaan (`PERPUS2026`), mencegah bot dan pengajuan fiktif.
+- **Otomasi Pengingat Denda WhatsApp 1-Klik**: Petugas dapat mengirim pesan penagihan denda keterlambatan Rp15.000,- langsung ke nomor WhatsApp siswa/wali dalam satu kali klik.
+- **Katalog Terpadu 8 Jurusan & Bank Soal TKA**: Navigasi dua tingkat (kaskade) untuk memilah modul 8 kejuruan serta carousel horizontal poster 3:4 bank soal TKA 2026.
+- **In-App E-Book PDF Viewer**: Membaca modul digital langsung di browser tanpa perlu mengunduh file berat.
 
 ---
 
