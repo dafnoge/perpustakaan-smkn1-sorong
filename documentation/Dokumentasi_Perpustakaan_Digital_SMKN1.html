@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Penggunaan & Dokumentasi Sistem - Perpustakaan Digital SMKN 1 Sorong</title>
+    <style>
+        /* =========================================================================
+           1. RESET & VARIABLES
+           ========================================================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #0f172a;
+            --primary-light: #3b82f6;
+            --accent: #d97706;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: #e2e8f0;
+            line-height: 1.5;
+            font-size: 9.5pt;
+        }
+
+        /* Top Bar navigasi saat dilihat di browser */
+        .no-print-bar {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .no-print-bar a {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .no-print-bar button {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .no-print-bar button:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================================================================
+           2. FORMAT LEMBAR KERJA A4 (SCREEN VIEW)
+           ========================================================================= */
+        .document-wrapper {
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .sheet {
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 18mm 18mm 16mm 18mm;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
+            border-radius: 6px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sheet-content {
+            flex-grow: 1;
+        }
+
+        .sheet-footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 6px;
+            font-size: 8pt;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        /* =========================================================================
+           3. COVER PAGE STYLING
+           ========================================================================= */
+        .cover-sheet {
+            text-align: center;
+            justify-content: space-between;
+        }
+
+        .badge-school {
+            display: inline-block;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 9pt;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .doc-title {
+            font-size: 20pt;
+            font-weight: 900;
+            color: var(--primary-dark);
+            line-height: 1.25;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .doc-subtitle {
+            font-size: 11.5pt;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+        }
+
+        .doc-desc {
+            font-size: 9pt;
+            color: var(--text-muted);
+            max-width: 90%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .hero-banner-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            padding: 22px 20px;
+            border-radius: 12px;
+            margin: 22px 0;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(30, 58, 138, 0.15);
+        }
+
+        .hero-banner-card h3 {
+            color: #fde047;
+            font-size: 12pt;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .hero-banner-card p {
+            font-size: 8.5pt;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .hero-pills {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 7.5pt;
+            font-weight: 700;
+        }
+
+        .hero-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 3px 10px;
+            border-radius: 12px;
+            color: #ffffff;
+        }
+
+        .team-section {
+            border-top: 1.5px solid var(--border-color);
+            padding-top: 16px;
+            margin-top: 15px;
+        }
+
+        .team-section-title {
+            font-weight: 800;
+            font-size: 8.5pt;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .team-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .team-name {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 8.5pt;
+            margin-bottom: 2px;
+        }
+
+        .team-role {
+            font-size: 7.5pt;
+            color: var(--text-muted);
+        }
+
+        /* =========================================================================
+           4. TYPOGRAPHY & INNER CONTENT
+           ========================================================================= */
+        h1 {
+            color: var(--primary-dark);
+            font-size: 13.5pt;
+            font-weight: 800;
+            border-left: 4.5px solid var(--primary);
+            padding-left: 8px;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 10pt;
+            font-weight: 700;
+            margin: 10px 0 4px 0;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2px;
+        }
+
+        h3 {
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 6px 0 2px 0;
+        }
+
+        p {
+            margin-bottom: 6px;
+            text-align: justify;
+            font-size: 8.5pt;
+        }
+
+        ul, ol {
+            margin-bottom: 6px;
+            padding-left: 18px;
+            font-size: 8.5pt;
+        }
+
+        li {
+            margin-bottom: 2px;
+        }
+
+        /* TABLES */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin: 6px 0 10px 0;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 5px 8px;
+            text-align: left;
+            border: 1px solid var(--primary);
+        }
+
+        td {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        /* CALLOUTS */
+        .callout {
+            border-left: 3.5px solid var(--primary-light);
+            background: #eff6ff;
+            padding: 6px 10px;
+            border-radius: 0 6px 6px 0;
+            margin: 6px 0;
+            font-size: 8pt;
+        }
+
+        .callout-warning { border-left-color: #eab308; background: #fefce8; }
+        .callout-danger { border-left-color: #ef4444; background: #fef2f2; }
+        .callout-success { border-left-color: #10b981; background: #ecfdf5; }
+
+        .callout-title { font-weight: 800; margin-bottom: 2px; }
+        .callout-warning .callout-title { color: #854d0e; }
+        .callout-danger .callout-title { color: #991b1b; }
+        .callout-success .callout-title { color: #065f46; }
+        .callout .callout-title { color: #1e40af; }
+
+        /* STEP ITEMS */
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .step-num {
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 7.5pt;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 7px;
+            margin-top: 1px;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 8.5pt;
+        }
+
+        .step-desc {
+            font-size: 8pt;
+            color: #475569;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            font-size: 6.5pt;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-amber { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+
+        .credentials-card {
+            background: #f1f5f9;
+            border: 1.5px dashed #94a3b8;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin: 6px 0;
+        }
+
+        .code-box {
+            font-family: Consolas, 'Courier New', monospace;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 7.5pt;
+            margin: 4px 0;
+            line-height: 1.35;
+        }
+
+        /* =========================================================================
+           5. MEDIA PRINT RULES (EXPORT KE PDF)
+           ========================================================================= */
+        @media print {
+            .no-print-bar {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+            }
+
+            .document-wrapper {
+                padding: 0 !important;
+                gap: 0 !important;
+            }
+
+            .sheet {
+                width: 100% !important;
+                min-height: auto !important;
+                height: auto !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+
+            .sheet:last-child {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 15mm 15mm 15mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bar Navigasi Layar (Hanya Muncul di Browser, Otomatis Hilang Saat Print/PDF) -->
+    <div class="no-print-bar">
+        <div>
+            <strong>Perpustakaan Digital SMKN 1 Sorong</strong> &bull; Pratinjau Dokumen Cetak A4
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="../index.html" target="_blank">Katalog Siswa &rarr;</a>
+            <a href="../admin.html" target="_blank">Portal Admin &rarr;</a>
+            <button onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+        </div>
+    </div>
+
+    <div class="document-wrapper">
+
+        <!-- =====================================================================
+             LEMBAR 1: HALAMAN JUDUL (COVER)
+             ===================================================================== -->
+        <div class="sheet cover-sheet">
+            <div class="sheet-content">
+                <span class="badge-school">SMK NEGERI 1 KOTA SORONG &bull; REKAYASA PERANGKAT LUNAK</span>
+                <h1 class="doc-title">PANDUAN PENGGUNA & DOKUMENTASI SISTEM</h1>
+                <div class="doc-subtitle">Perpustakaan Digital SMKN 1 Sorong Berbantuan AI</div>
+                <p class="doc-desc">
+                    Sistem Informasi Sirkulasi Modul Vokasi, Bank Soal Tes Kemampuan Akademik (TKA) 2026, Anjungan Kios Mandiri, dan Otomasi Pengingat Denda WhatsApp Terintegrasi Cloud Database Supabase.
+                </p>
+
+                <div class="hero-banner-card">
+                    <h3>🌟 INOVASI LITERASI VOKASI MODERN</h3>
+                    <p>
+                        Aplikasi web berbasis *Mobile-First* yang menyatukan katalog kurikulum nasional dengan 8 jurusan kejuruan spesifik SMKN 1 Sorong, sistem verifikasi kode kios anti-bot, pembaca modul e-book terintegrasi, serta monitoring masa pinjam realtime.
+                    </p>
+                    <div class="hero-pills">
+                        <span class="hero-pill">📚 8 Jurusan Resmi SMK</span>
+                        <span class="hero-pill">⭐ Bank Soal TKA 2026</span>
+                        <span class="hero-pill">🔐 Otorisasi Kios</span>
+                        <span class="hero-pill">💬 Denda WhatsApp</span>
+                        <span class="hero-pill">📊 Ekspor Excel</span>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <div class="team-section-title">TIM PENGEMBANG APLIKASI (KELAS XII RPL)</div>
+                    <div class="team-grid">
+                        <div class="team-card">
+                            <div class="team-name">Reyhan Daffa Adilla H.</div>
+                            <div class="team-role">Project Manager / Fullstack Lead</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-name">Muhammad Ichsan</div>
+                            <div class="team-role">UI/UX Designer & Content Specialist</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-name">Mazmur Novbertman</div>
+                            <div class="team-role">QA Tester & Documentation Specialist</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Tahun Ajaran 2026/2027 &bull; Kota Sorong, Papua Barat Daya</span>
+                <span>Halaman 1 dari 6</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             LEMBAR 2: BAB I - PENDAHULUAN & PROFIL
+             ===================================================================== -->
+        <div class="sheet">
+            <div class="sheet-content">
+                <h1>BAB I. PENDAHULUAN & PROFIL SISTEM</h1>
+
+                <h2>1.1 Latar Belakang Masalah</h2>
+                <p>
+                    Perpustakaan SMK Negeri 1 Sorong mengelola ribuan buku fisik mata pelajaran umum dan modul keahlian khusus kejuruan. Dalam kegiatan sirkulasi buku sehari-hari, perpustakaan menghadapi beberapa kendala utama:
+                </p>
+                <ul>
+                    <li><strong>Pencatatan Konvensional:</strong> Pendataan masih mengandalkan buku besar fisik sehingga lambat dan berpotensi terselip.</li>
+                    <li><strong>Tingginya Keterlambatan Modul Praktik:</strong> Buku modul kejuruan memiliki stok terbatas namun sangat krusial untuk praktik bengkel/lab. Siswa kerap terlambat mengembalikan buku dan petugas kesulitan menghubungi siswa.</li>
+                    <li><strong>Kebutuhan Persiapan TKA (Tes Kemampuan Akademik) 2026:</strong> Belum tersedianya wadah digital terpadu untuk bank soal latihan seleksi perguruan tinggi kedinasan/vokasi bagi siswa tingkat akhir.</li>
+                    <li><strong>Antrean Panjang Jam Istirahat:</strong> Keterbatasan petugas jaga menyebabkan antrean saat siswa meminjam buku bersamaan.</li>
+                </ul>
+
+                <h2>1.2 Solusi Inovatif & Nilai Tambah Aplikasi</h2>
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div>
+                        <div class="step-title">Anjungan Kios Mandiri & Otorisasi Petugas</div>
+                        <div class="step-desc">Siswa dapat meminjam mandiri di komputer perpustakaan dengan kode otorisasi rahasia harian dari petugas (anti-spam bot).</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div>
+                        <div class="step-title">Katalog Khusus 8 Jurusan & Bank Soal TKA</div>
+                        <div class="step-desc">Navigasi dua tingkat (kaskade) untuk memilah modul RPL, TJKT, DKV, MPLB, AKL, TPMG, GP, dan TET, serta carousel poster bank soal TKA 2026.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div>
+                        <div class="step-title">Otomasi Pengingat Denda WhatsApp Sekali Klik</div>
+                        <div class="step-desc">Sistem menghitung keterlambatan otomatis. Jika melewati batas tenggat, petugas cukup menekan 1 tombol untuk mengirim pesan denda Rp15.000,- langsung ke WA siswa/wali.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div>
+                        <div class="step-title">Pratinjau Modul Digital (E-Book Viewer)</div>
+                        <div class="step-desc">Siswa dapat membaca modul PDF pembelajaran secara langsung di browser tanpa perlu mengunduh file berat ke memori HP.</div>
+                    </div>
+                </div>
+
+                <h2>1.3 Tautan Aplikasi Online & Spesifikasi Teknis</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 28%;">Komponen</th>
+                            <th style="width: 44%;">Tautan / Spesifikasi</th>
+                            <th style="width: 28%;">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Katalog Siswa</strong></td>
+                            <td><code>https://dafnoge.github.io/perpustakaan-smkn1-sorong/</code></td>
+                            <td>Akses publik bebas login</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Portal Login Petugas</strong></td>
+                            <td><code>https://dafnoge.github.io/perpustakaan-smkn1-sorong/login.html</code></td>
+                            <td>Autentikasi Supabase Auth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dashboard Admin</strong></td>
+                            <td><code>https://dafnoge.github.io/perpustakaan-smkn1-sorong/admin.html</code></td>
+                            <td>Manajemen data & sirkulasi</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tech Stack</strong></td>
+                            <td>HTML5, Tailwind CSS, Supabase PostgreSQL, SheetJS</td>
+                            <td>Desain Mobile-First 360px</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Perpustakaan Digital SMKN 1 Sorong &bull; Dokumen Resmi</span>
+                <span>Halaman 2 dari 6</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             LEMBAR 3: BAB II - PANDUAN PENGGUNA SISWA
+             ===================================================================== -->
+        <div class="sheet">
+            <div class="sheet-content">
+                <h1>BAB II. MANUAL PENGGUNA SISWA (KATALOG & KIOS)</h1>
+
+                <p>
+                    Halaman publik (<code>index.html</code>) dirancang dengan pendekatan *Mobile-First*, memungkinkan siswa mengaksesnya melalui ponsel pintar dengan resolusi layar 360px maupun tablet/PC anjungan kios perpustakaan sekolah.
+                </p>
+
+                <h2>2.1 Pencarian Cerdas & Navigasi Kategori (Kaskade)</h2>
+                <div class="step-item">
+                    <div class="step-num">A</div>
+                    <div>
+                        <div class="step-title">Pencarian Cepat Judul & Penulis</div>
+                        <div class="step-desc">Ketikkan kata kunci judul buku, pengarang, atau topik kejuruan di kotak pencarian hero banner. Etalase buku tersaring secara otomatis.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">B</div>
+                    <div>
+                        <div class="step-title">Filter Dua Tingkat (Kaskade) 8 Jurusan Kejuruan</div>
+                        <div class="step-desc">Pilih kategori umum atau Kejuruan. Khusus Kejuruan, muncul dropdown tingkat kedua berisi 8 jurusan resmi SMKN 1 Sorong: <em>1. RPL, 2. TJKT, 3. DKV, 4. MPLB, 5. AKL, 6. TPMG, 7. GP, dan 8. TET</em>.</div>
+                    </div>
+                </div>
+
+                <h2>2.2 Carousel Horizontal Bank Soal TKA 2026</h2>
+                <p>
+                    Bagian atas katalog menampilkan kartu poster buku 3:4 khusus persiapan <strong>Tes Kemampuan Akademik (TKA) 2026</strong>. Siswa dapat menggeser carousel ke samping untuk melihat bank soal latihan ujian.
+                </p>
+
+                <h2>2.3 Fitur Pratinjau E-Book (In-App PDF Viewer)</h2>
+                <p>
+                    Buku yang memiliki modul digital dilengkapi tombol <strong>"📖 Baca E-Book"</strong>. Saat diklik, modal pembaca PDF interaktif muncul di layar sehingga siswa dapat membaca materi modul tanpa mengunduh file dokumen.
+                </p>
+
+                <h2>2.4 Prosedur Peminjaman Buku di Kios Mandiri</h2>
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div>
+                        <div class="step-title">Tentukan Kuantitas Buku (1 s/d 3 Eksemplar)</div>
+                        <div class="step-desc">Gunakan tombol (-) atau (+) untuk menentukan jumlah eksemplar buku yang dipinjam (maksimal 3 buku per pengajuan).</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div>
+                        <div class="step-title">Lengkapi Data Identitas Siswa</div>
+                        <div class="step-desc">Isi Nama Lengkap, NIS, Pilihan Tingkat Kelas (X, XI, XII), dan Jurusan Kejuruan.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div>
+                        <div class="step-title">Nomor WhatsApp Aktif Siswa / Wali</div>
+                        <div class="step-desc">Sistem otomatis memformat awalan nomor menjadi kode negara <code>628...</code> untuk keperluan konfirmasi dan pengingat.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div>
+                        <div class="step-title">Pilih Durasi Peminjaman</div>
+                        <div class="step-desc"><strong>Reguler (7 Hari)</strong> untuk belajar di rumah, atau <strong>Harian (Jam Sekolah)</strong> wajib kembali sebelum pukul 14:45 WIT.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div>
+                        <div class="step-title">Masukkan Kode Verifikasi Petugas Kios (WAJIB)</div>
+                        <div class="step-desc">Minta kode otorisasi kepada petugas jaga perpustakaan (default: <strong>PERPUS2026</strong>) untuk membuka kunci tombol konfirmasi.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div>
+                        <div class="step-title">Persetujuan Denda Keterlambatan Rp15.000,-</div>
+                        <div class="step-desc">Centang kotak persetujuan denda otomatis keterlambatan sebelum menekan tombol <strong>"Konfirmasi Pinjam"</strong>.</div>
+                    </div>
+                </div>
+
+                <div class="callout callout-warning">
+                    <div class="callout-title">⚠️ Validasi Waktu Pembelajaran Aktif</div>
+                    Peminjaman mandiri di anjungan kios hanya dapat dilakukan pada jam operasional sekolah: pukul <strong>07:30 s/d 14:45 WIT</strong>. Peminjaman di luar jam ini akan dibatalkan otomatis.
+                </div>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Perpustakaan Digital SMKN 1 Sorong &bull; Dokumen Resmi</span>
+                <span>Halaman 3 dari 6</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             LEMBAR 4: BAB III - PANDUAN ADMIN & AKUN DEMO
+             ===================================================================== -->
+        <div class="sheet">
+            <div class="sheet-content">
+                <h1>BAB III. MANUAL PETUGAS PERPUSTAKAAN (ADMIN)</h1>
+
+                <p>
+                    Halaman Dashboard Admin (<code>admin.html</code>) merupakan pusat operasional petugas untuk memantau sirkulasi peminjaman, eksekusi denda, serta pengelolaan stok katalog secara terpusat.
+                </p>
+
+                <h2>3.1 Cara Login & Kredensial Akun Demo Pengujian</h2>
+                <p>
+                    Buka tautan <code>login.html</code>, lalu gunakan akun demo yang terdaftar pada Supabase Authentication:
+                </p>
+
+                <div class="credentials-card">
+                    <div style="font-weight: 800; color: var(--primary); margin-bottom: 4px; font-size: 8.5pt;">
+                        🔑 KREDENSIAL AKUN DEMO PENGUJIAN JURI & PETUGAS
+                    </div>
+                    <table>
+                        <tr>
+                            <td style="width: 25%; font-weight: 700;">Halaman Login</td>
+                            <td><code>https://dafnoge.github.io/perpustakaan-smkn1-sorong/login.html</code></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">Email Akun Admin</td>
+                            <td><strong style="color: var(--primary-light);">admin@smkn1sorong.sch.id</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">Kata Sandi (Password)</td>
+                            <td><strong style="color: var(--primary-dark);">AdminPerpus2026!</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">Kode Kios Anjungan</td>
+                            <td><strong style="color: var(--accent);">PERPUS2026</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2>3.2 Kartu Statistik Pemantauan Real-Time</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Indikator</th>
+                            <th style="width: 58%;">Fungsi Pemantauan</th>
+                            <th style="width: 17%;">Badge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>📚 Total Koleksi</strong></td>
+                            <td>Jumlah ragam judul buku fisik yang terdaftar di basis data.</td>
+                            <td><span class="badge badge-blue">Biru</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>⏳ Sedang Dipinjam</strong></td>
+                            <td>Jumlah transaksi buku yang saat ini masih dipinjam siswa.</td>
+                            <td><span class="badge badge-amber">Kuning</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🚨 Terlambat Denda</strong></td>
+                            <td>Siswa yang melewati batas tenggat pengembalian dan berstatus denda aktif.</td>
+                            <td><span class="badge badge-red">Merah</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>⭐ Koleksi TKA</strong></td>
+                            <td>Jumlah judul modul persiapan Tes Kemampuan Akademik 2026.</td>
+                            <td><span class="badge badge-green">Ungu</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>3.3 Panel Pengaturan Kode Verifikasi Kios Anjungan</h2>
+                <p>
+                    Petugas perpustakaan memiliki wewenang penuh untuk mengubah kode otorisasi kios kapan saja:
+                </p>
+                <ul>
+                    <li><strong>Simpan Kode Baru:</strong> Ketik kode baru (misal: <code>RPL2026</code>) lalu klik <strong>"💾 Simpan Kode"</strong>. Kode langsung tersinkronisasi instan ke modal pinjam siswa.</li>
+                    <li><strong>Reset Default:</strong> Klik <strong>"Reset Default"</strong> untuk mengembalikan kode ke <strong>PERPUS2026</strong> jika diperlukan.</li>
+                </ul>
+
+                <h2>3.4 Tabel Pemantauan & Realtime Countdown Timer</h2>
+                <div class="step-item">
+                    <div class="step-num">&bull;</div>
+                    <div>
+                        <div class="step-title">⏱️ Hitung Mundur Real-Time (Sisa Hari & Jam)</div>
+                        <div class="step-desc">Kolom khusus yang menghitung sisa waktu pinjam tiap siswa secara dinamis. Tampil hijau bertuliskan <em>"Sisa X Hari Y Jam"</em> saat masih berlaku, dan berubah menjadi badge merah berkedip bertuliskan <em>"⚠️ Lewat X Hari Y Jam"</em> saat jatuh tempo terlewati.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">&bull;</div>
+                    <div>
+                        <div class="step-title">Penyaring Status Transaksi</div>
+                        <div class="step-desc">Dropdown untuk menyaring tampilan tabel: <em>Semua Status</em>, <em>Sedang Dipinjam</em>, <em>Lewat Tenggat Saja</em>, atau <em>Sudah Dikembalikan</em>.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Perpustakaan Digital SMKN 1 Sorong &bull; Dokumen Resmi</span>
+                <span>Halaman 4 dari 6</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             LEMBAR 5: BAB IV - AKSI PETUGAS & MANAJEMEN STOK
+             ===================================================================== -->
+        <div class="sheet">
+            <div class="sheet-content">
+                <h1>BAB IV. AKSI PETUGAS & MANAJEMEN STOK KATALOG</h1>
+
+                <h2>4.1 Pengingat Denda WhatsApp Otomatis (1-Klik)</h2>
+                <p>
+                    Bagi siswa yang berstatus <strong>Lewat Tenggat (Overdue)</strong>, muncul tombol hijau berlogo WhatsApp <strong>"Kirim WA Denda"</strong>. Saat diklik, sistem membuka WhatsApp dengan format pesan otomatis:
+                </p>
+                <div class="callout callout-danger">
+                    <div class="callout-title">💬 Format Notifikasi WhatsApp Terstruktur:</div>
+                    <div class="code-box">
+Pemberitahuan Perpustakaan SMKN 1 Sorong
+Halo [Nama Siswa] (Kelas [Kelas] [Jurusan]),
+Buku "[Judul Buku]" yang Anda pinjam telah melewati batas tenggat ([Tanggal Tenggat]).
+Dikenakan denda keterlambatan sebesar Rp 15.000,-.
+Harap segera mengembalikan buku ke meja perpustakaan. Terima kasih.
+                    </div>
+                </div>
+
+                <h2>4.2 Pengembalian Buku & Pembatalan Transaksi</h2>
+                <ul>
+                    <li><strong>Tombol "✅ Dikembalikan":</strong> Menandai buku telah selesai dipinjam, menghentikan timer, dan memulihkan stok buku (+kuantitas pinjam) ke database secara otomatis.</li>
+                    <li><strong>Tombol "❌ Batalkan / Tolak":</strong> Digunakan jika siswa salah mengajukan data. Status transaksi diubah menjadi <em>canceled</em> dan stok buku otomatis dipulihkan.</li>
+                </ul>
+
+                <h2>4.3 Ekspor Rekapitulasi Laporan Excel (.xlsx)</h2>
+                <p>
+                    Tombol <strong>"📥 Eksport Laporan (Excel)"</strong> di atas tabel pemantauan memanfaatkan pustaka <em>SheetJS</em> untuk mengunduh seluruh rekapan data sirkulasi buku (Nama, NIS, Jurusan, Judul Buku, Tgl Pinjam, Tenggat, Status) menjadi file spreadsheet <code>Laporan_Peminjaman_Perpus_SMKN1.xlsx</code> untuk pelaporan berkala ke pimpinan sekolah.
+                </p>
+
+                <h2>4.4 Formulir Tambah Koleksi Buku Baru ke Supabase</h2>
+                <p>Petugas dapat mendaftarkan buku baru dengan ketentuan berikut:</p>
+                <ul>
+                    <li><strong>Judul & Pengarang:</strong> Data identitas bibliografi buku.</li>
+                    <li><strong>Kategori & Spesifik Jurusan:</strong> Memilih 8 kategori umum atau Kejuruan (RPL, TJKT, DKV, MPLB, AKL, TPMG, GP, TET).</li>
+                    <li><strong>Penanda Buku TKA:</strong> Centang opsi bintang <em>"⭐ Tandai sebagai Koleksi Bank Soal TKA"</em> agar buku otomatis dipajang di carousel horizontal teratas katalog siswa.</li>
+                    <li><strong>Dual-Tab Unggah Cover:</strong> Petugas dapat memilih <em>Tab File</em> (mengunggah file gambar JPG/PNG langsung ke Supabase Storage) atau <em>Tab URL</em> (menempel tautan gambar online).</li>
+                    <li><strong>Tautan E-Book:</strong> Tautan file PDF modul untuk dibaca siswa pada fitur E-Book Viewer.</li>
+                </ul>
+
+                <h2>4.5 Manajemen Stok Cepat (+ / -) & Hapus Permanen</h2>
+                <ul>
+                    <li><strong>Tombol Cepat (+ / -):</strong> Menambah atau mengurangi stok buku secara instan tanpa reload penuh. Perubahan stok langsung tersimpan ke Supabase.</li>
+                    <li><strong>Perbarui Cover:</strong> Mengganti gambar sampul buku kapan saja melalui modal edit cover.</li>
+                    <li><strong>Hapus Buku (Ikon Tong Sampah 🗑️):</strong> Menghapus buku secara permanen dari database Supabase dengan proteksi dialog <code>confirm()</code> serta validasi relasi peminjaman (*Foreign Key*) dan keamanan *Row Level Security* (RLS).</li>
+                </ul>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Perpustakaan Digital SMKN 1 Sorong &bull; Dokumen Resmi</span>
+                <span>Halaman 5 dari 6</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             LEMBAR 6: BAB V - PENGUJIAN & PENUTUP
+             ===================================================================== -->
+        <div class="sheet">
+            <div class="sheet-content">
+                <h1>BAB V. PENGUJIAN SISTEM & KESIMPULAN</h1>
+
+                <h2>5.1 Matriks Hasil Pengujian Fungsional (Black-Box Testing)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">No</th>
+                            <th style="width: 25%;">Fitur Diuji</th>
+                            <th style="width: 42%;">Skenario & Langkah Uji</th>
+                            <th style="width: 16%;">Hasil Sistem</th>
+                            <th style="width: 12%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Akses Mobile (360px)</td>
+                            <td>Buka web di browser ponsel Android dan iPhone</td>
+                            <td>Layout responsif, teks rapi</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Filter Kaskade 8 Jurusan</td>
+                            <td>Pilih kategori "Kejuruan" ➔ pilih "RPL"</td>
+                            <td>Hanya buku RPL yang muncul</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Validasi Kios Petugas</td>
+                            <td>Isi kode salah "1234" vs benar "PERPUS2026"</td>
+                            <td>Kode salah ditolak sistem</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Hitung Mundur Realtime</td>
+                            <td>Simulasi peminjaman dengan tanggal lampau</td>
+                            <td>Timer merah "Lewat X Hari"</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Pemicu WA Denda</td>
+                            <td>Klik tombol "Kirim WA Denda" pada overdue</td>
+                            <td>Pesan WA denda Rp15.000,-</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Ekspor Excel SheetJS</td>
+                            <td>Klik tombol "Eksport Laporan (Excel)" di admin</td>
+                            <td>File .xlsx otomatis terunduh</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Hapus Buku & RLS</td>
+                            <td>Hapus buku dari database Supabase</td>
+                            <td>Dialog konfirmasi & terhapus</td>
+                            <td><span class="badge badge-green">SUKSES</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>5.2 Keamanan & Standarisasi Data (Checklist Keamanan)</h2>
+                <div class="callout callout-success">
+                    <div class="callout-title">🛡️ Penerapan Keamanan Basis Data & Frontend:</div>
+                    &bull; <strong>Row Level Security (RLS):</strong> Akses tabel peminjaman dan buku dilindungi oleh aturan otorisasi Supabase.<br>
+                    &bull; <strong>Sanitasi Input XSS:</strong> Semua teks masukan siswa disanitasi dengan fungsi escape karakter berbahaya sebelum dirender ke DOM.<br>
+                    &bull; <strong>Anti-Spam Kios:</strong> Kode otorisasi dinamis memutus potensi spam pengajuan otomatis dari luar sekolah.
+                </div>
+
+                <h2>5.3 Kesimpulan & Rencana Pengembangan Masa Depan</h2>
+                <p>
+                    Aplikasi <strong>Perpustakaan Digital SMKN 1 Sorong</strong> membuktikan bahwa kolaborasi siswa SMK dan teknologi kecerdasan buatan (*Artificial Intelligence*) mampu melahirkan produk perangkat lunak berdaya guna nyata, memecahkan masalah sirkulasi buku kejuruan, dan meningkatkan budaya literasi sekolah.
+                </p>
+                <p><strong>Rencana Pengembangan Tahap Selanjutnya:</strong></p>
+                <ul>
+                    <li>Integrasi pembacaan kartu pelajar digital menggunakan scanner Barcode / QR Code kamera smartphone.</li>
+                    <li>Penerapan <em>Automated WhatsApp Webhook Gateway</em> untuk pengiriman pesan pengingat denda otomatis terjadwal (*cron job*) tanpa perlu klik manual dari petugas.</li>
+                </ul>
+
+                <div style="margin-top: 15px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 8pt; color: var(--text-muted);">
+                    Dokumentasi Resmi &bull; SMKN 1 Kota Sorong &bull; Rekayasa Perangkat Lunak 2026
+                </div>
+            </div>
+
+            <div class="sheet-footer">
+                <span>Perpustakaan Digital SMKN 1 Sorong &bull; Dokumen Resmi</span>
+                <span>Halaman 6 dari 6</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
