@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Perpustakaan SMKN 1 Sorong</title>
+    
+    <!-- CDN Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- CDN Supabase JS Library (Versi 2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- CDN SheetJS (xlsx) untuk Eksport Data ke File Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- Google Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .table-container {
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- =========================================================================
+         1. NAVBAR DASHBOARD ADMIN (RESPONSIF MOBILE-FIRST < 640px / 360px)
+         ========================================================================= -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40 py-2.5 sm:py-0 border-b border-blue-800">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 sm:h-20">
+                
+                <!-- Baris 1: Logo Resmi & Judul -->
+                <div class="flex items-center justify-between w-full sm:w-auto">
+                    <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+                        <img 
+                            src="assets/logo-smk1sorong.png" 
+                            alt="Logo SMKN 1 Sorong" 
+                            onerror="this.src='asset/logo-smkn1sorong.jpeg';" 
+                            class="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-xl p-0.5 border border-blue-400 bg-white shadow-inner flex-shrink-0"
+                        >
+                        <div>
+                            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                                <h1 class="text-sm sm:text-lg font-extrabold tracking-tight text-white leading-tight">
+                                    SMKN 1 SORONG
+                                </h1>
+                                <span class="bg-amber-400 text-blue-950 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                    PANEL ADMIN
+                                </span>
+                            </div>
+                            <p class="text-[10px] sm:text-xs text-blue-200 font-medium hidden sm:block">
+                                Sistem Informasi Perpustakaan & Pemantauan Denda
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Badge Realtime Versi Mobile -->
+                    <div id="realtimeBadgeMobile" class="flex sm:hidden items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
+                        Realtime
+                    </div>
+                </div>
+
+                <!-- Baris 2 & 3: Info Akun & Tombol Aksi Berdampingan -->
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:space-x-3 w-full sm:w-auto">
+                    
+                    <div class="flex items-center justify-between sm:justify-end gap-2">
+                        <div id="realtimeBadgeDesktop" class="hidden sm:flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+                            Realtime Aktif
+                        </div>
+
+                        <span id="adminEmailDisplay" class="text-[11px] sm:text-xs font-semibold text-blue-200 bg-blue-800/90 px-2.5 py-1 rounded-lg border border-blue-700 truncate max-w-[220px] sm:max-w-xs">
+                            Memuat akun...
+                        </span>
+                    </div>
+
+                    <!-- Tombol Aksi (Grid 2 Kolom di HP) -->
+                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:space-x-2">
+                        <a href="index.html" target="_blank" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold rounded-xl bg-blue-800 hover:bg-blue-700 text-white border border-blue-700 transition shadow-sm text-center">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            Katalog Siswa
+                        </a>
+                        <button id="logoutBtn" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow transition text-center">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Keluar
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         2. KONTEN DASHBOARD UTAMA
+         ========================================================================= -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 flex-grow w-full space-y-6 sm:space-y-8">
+
+        <!-- KARTU STATISTIK RINGKAS (RESPONSIF GRID 2X2 DI LAYAR HP) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+            
+            <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3.5">
+                <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg sm:text-2xl flex-shrink-0">
+                    📚
+                </div>
+                <div>
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide">Total Koleksi</p>
+                    <h3 id="statTotalBooks" class="text-lg sm:text-2xl font-extrabold text-slate-900 mt-0.5">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3.5">
+                <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg sm:text-2xl flex-shrink-0">
+                    ⏳
+                </div>
+                <div>
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide">Sedang Dipinjam</p>
+                    <h3 id="statActiveBorrows" class="text-lg sm:text-2xl font-extrabold text-amber-600 mt-0.5">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3.5">
+                <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg sm:text-2xl flex-shrink-0">
+                    🚨
+                </div>
+                <div>
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide">Terlambat Denda</p>
+                    <h3 id="statOverdueBorrows" class="text-lg sm:text-2xl font-extrabold text-rose-600 mt-0.5">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-2.5 sm:space-x-3.5">
+                <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg sm:text-2xl flex-shrink-0">
+                    ⭐
+                </div>
+                <div>
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide">Koleksi TKA</p>
+                    <h3 id="statTkaBooks" class="text-lg sm:text-2xl font-extrabold text-purple-700 mt-0.5">0</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =====================================================================
+             PANEL PENGATURAN KODE VERIFIKASI KIOS ANJUNGAN PERPUS
+             ===================================================================== -->
+        <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-700">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🔐</span>
+                        <h2 class="text-base sm:text-lg font-black text-white">
+                            Pengaturan Kode Verifikasi Kios
+                        </h2>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-blue-950">
+                            Keamanan Kios
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-300 max-w-2xl">
+                        Kode ini wajib dimasukkan oleh siswa di komputer anjungan untuk mencegah spam bot saat meminjam buku. Petugas jaga perpustakaan dapat mengubahnya sewaktu-waktu.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="kioskAuthCodeSettingInput" 
+                            maxlength="20"
+                            placeholder="Kode Baru..." 
+                            class="px-3.5 py-2 bg-slate-800 text-amber-300 border border-slate-600 rounded-xl text-xs font-mono font-bold tracking-widest uppercase focus:ring-2 focus:ring-amber-400 focus:outline-none w-full sm:w-44"
+                        >
+                    </div>
+                    <button 
+                        type="button" 
+                        onclick="saveKioskAuthCodeSetting()" 
+                        class="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-blue-950 rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center space-x-1"
+                    >
+                        <span>💾</span>
+                        <span>Simpan Kode</span>
+                    </button>
+                    <button 
+                        type="button" 
+                        onclick="resetKioskAuthCodeSetting()" 
+                        class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition border border-slate-700 flex items-center justify-center"
+                        title="Kembalikan ke PERPUS2026"
+                    >
+                        Reset Default
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-3 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
+                <div>
+                    Kode Kios Aktif Saat Ini: <strong id="currentActiveCodeBadge" class="font-mono text-amber-300 text-xs px-2 py-0.5 bg-slate-800 rounded-lg border border-slate-700">PERPUS2026</strong>
+                </div>
+                <div class="text-[10px] text-emerald-400 flex items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
+                    Sinkronisasi instan ke seluruh halaman peminjaman siswa
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             BAGIAN 1: TABEL PEMANTAUAN PEMINJAMAN SISWA (SCROLLABLE & 8 JURUSAN)
+             ===================================================================== -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">
+                            Pemantauan Peminjaman & Pengingat WA
+                        </h2>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-900">
+                            Realtime
+                        </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                        Memantau data peminjam dari 8 jurusan resmi SMKN 1 Sorong dan kirim WA pengingat denda Rp15.000,-.
+                    </p>
+                </div>
+
+                <div class="flex items-center space-x-2 w-full md:w-auto flex-wrap gap-y-2">
+                    <select id="borrowStatusFilter" class="w-full md:w-auto px-3 py-1.5 sm:py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+                        <option value="ALL">Semua Status</option>
+                        <option value="borrowed">Sedang Dipinjam</option>
+                        <option value="overdue">⚠️ Lewat Tenggat Saja</option>
+                        <option value="returned">Sudah Dikembalikan</option>
+                    </select>
+                    
+                    <!-- Tombol Eksport Laporan ke File Excel / CSV -->
+                    <button 
+                        id="exportExcelBtn" 
+                        onclick="exportBorrowToExcel()" 
+                        class="inline-flex items-center px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition shadow-xs flex-shrink-0"
+                        title="Unduh seluruh data peminjaman menjadi file Excel (.xlsx)"
+                    >
+                        <span class="mr-1">📥</span>
+                        <span class="hidden sm:inline">Eksport Laporan (Excel)</span>
+                        <span class="sm:hidden">Excel</span>
+                    </button>
+
+                    <button id="refreshTableBtn" class="p-1.5 sm:p-2 text-slate-500 hover:text-blue-900 hover:bg-slate-100 rounded-xl transition flex-shrink-0" title="Refresh manual">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wadah Tabel Scrollable di HP -->
+            <div class="table-container w-full overflow-x-auto min-w-full">
+                <table class="w-full text-left border-collapse text-xs min-w-[850px]">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-extrabold tracking-wider text-[10px] sm:text-[11px]">
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">No.</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Siswa (Nama & NIS)</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Kelas & Jurusan</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Buku Dipinjam</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Tgl Pinjam & Tenggat</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4 text-center">⏱️ Sisa Waktu (Realtime)</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4 text-center">Status</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4 text-center">Aksi Petugas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowRecordsTableBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="8" class="py-10 text-center text-slate-400">
+                                <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent mb-1.5"></div>
+                                <p class="text-xs">Memuat data peminjaman...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyBorrowTable" class="hidden py-10 text-center">
+                <p class="text-xs sm:text-sm font-bold text-slate-700">Belum ada catatan peminjaman</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Data peminjaman siswa akan otomatis masuk secara realtime.</p>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             BAGIAN 2: FORM TAMBAH BUKU (DENGAN KATEGORI RESMI & 8 JURUSAN)
+             ===================================================================== -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg sm:text-xl">➕</span>
+                    <div>
+                        <h2 class="text-sm sm:text-base font-extrabold leading-tight">Tambah Buku Baru ke Katalog</h2>
+                        <p class="text-[11px] sm:text-xs text-blue-200">Sesuai kategori kurikulum nasional & 8 jurusan resmi SMKN 1 Sorong</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="addBookForm" class="p-4 sm:p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+                    
+                    <!-- Judul Buku -->
+                    <div class="md:col-span-2">
+                        <label for="bookTitleInput" class="block text-xs font-bold text-slate-700 mb-1">Judul Buku <span class="text-rose-500">*</span></label>
+                        <input type="text" id="bookTitleInput" required placeholder="Contoh: Modul Pembelajaran TKA Matematika SMK 2026" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                    </div>
+
+                    <!-- Penulis -->
+                    <div>
+                        <label for="bookAuthorInput" class="block text-xs font-bold text-slate-700 mb-1">Penulis / Pengarang <span class="text-rose-500">*</span></label>
+                        <input type="text" id="bookAuthorInput" required placeholder="Contoh: Tim MGMP SMKN 1 Sorong" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                    </div>
+
+                    <!-- Kategori Utama (8 Kategori Resmi + TKA) -->
+                    <div>
+                        <label for="bookCategoryInput" class="block text-xs font-bold text-slate-700 mb-1">Kategori Utama <span class="text-rose-500">*</span></label>
+                        <select 
+                            id="bookCategoryInput" 
+                            required 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition font-medium"
+                        >
+                            <option value="">-- Pilih Kategori Utama --</option>
+                            <option value="Matematika">1. Matematika</option>
+                            <option value="Bahasa Indonesia">2. Bahasa Indonesia</option>
+                            <option value="Bahasa Inggris">3. Bahasa Inggris</option>
+                            <option value="PPKN">4. PPKN</option>
+                            <option value="IPS">5. IPS</option>
+                            <option value="IPAS">6. IPAS</option>
+                            <option value="Seni Musik">7. Seni Musik</option>
+                            <option value="Kejuruan">8. Kejuruan (Vokasi)</option>
+                            <option value="TKA">9. Bank Soal TKA</option>
+                            <option value="Umum">10. Referensi Umum</option>
+                        </select>
+                    </div>
+
+                    <!-- Spesifikasi Jurusan (Opsional jika memilih Kejuruan) -->
+                    <div>
+                        <label for="bookTargetMajorInput" class="block text-xs font-bold text-slate-700 mb-1">
+                            Spesifik Jurusan <span class="text-slate-400 font-normal">(Jika Kejuruan)</span>
+                        </label>
+                        <select 
+                            id="bookTargetMajorInput" 
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                        >
+                            <option value="">-- Umum / Semua Jurusan --</option>
+                            <option value="RPL">RPL (Rekayasa Perangkat Lunak)</option>
+                            <option value="TJKT">TJKT (Teknik Jaringan Komputer & Telko)</option>
+                            <option value="DKV">DKV (Desain Komunikasi Visual)</option>
+                            <option value="MPLB">MPLB (Manajemen Perkantoran)</option>
+                            <option value="AKL">AKL (Akuntansi & Keuangan)</option>
+                            <option value="TPMG">TPMG (Perminyakan & Gas)</option>
+                            <option value="GP">GP (Geologi Pertambangan)</option>
+                            <option value="TET">TET (Teknik Energi Terbarukan)</option>
+                        </select>
+                    </div>
+
+                    <!-- Stok Buku -->
+                    <div>
+                        <label for="bookStockInput" class="block text-xs font-bold text-slate-700 mb-1">Jumlah Stok Awal <span class="text-rose-500">*</span></label>
+                        <input type="number" id="bookStockInput" required min="1" value="5" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                    </div>
+
+                    <!-- Link Download File eBook -->
+                    <div class="md:col-span-3">
+                        <label for="bookEbookUrlInput" class="block text-xs font-bold text-slate-700 mb-1">Tautan File eBook Digital <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                        <input type="url" id="bookEbookUrlInput" placeholder="https://...link file PDF" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                    </div>
+
+                    <!-- Dual Option Upload Gambar Sampul Buku -->
+                    <div class="md:col-span-3 bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <label class="block text-xs font-bold text-slate-700">
+                                Gambar Sampul Buku (Cover Poster 3:4)
+                            </label>
+
+                            <div class="inline-flex rounded-xl bg-slate-200/80 p-1 text-[11px] font-bold self-start sm:self-auto">
+                                <button type="button" id="tabAddCoverFileBtn" class="px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition">
+                                    📁 Upload File
+                                </button>
+                                <button type="button" id="tabAddCoverUrlBtn" class="px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition">
+                                    🔗 Tautan URL
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Opsi 1: Upload File Gambar dari Perangkat -->
+                        <div id="addCoverFileTabContent" class="space-y-2">
+                            <input 
+                                type="file" 
+                                id="bookCoverFileInput" 
+                                accept="image/png, image/jpeg, image/jpg, image/webp" 
+                                class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-900 hover:file:bg-blue-200 cursor-pointer"
+                            >
+                            <p class="text-[11px] text-slate-400">
+                                Pilih gambar dari galeri HP atau komputer (JPG, PNG, WEBP).
+                            </p>
+                        </div>
+
+                        <!-- Opsi 2: Input URL Gambar Online -->
+                        <div id="addCoverUrlTabContent" class="hidden space-y-2">
+                            <input 
+                                type="url" 
+                                id="bookCoverUrlInput" 
+                                placeholder="https://images.unsplash.com/... atau link gambar langsung" 
+                                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 transition"
+                            >
+                        </div>
+
+                        <!-- Pratinjau Gambar Cover -->
+                        <div id="addCoverPreviewContainer" class="hidden flex items-center space-x-3 p-2.5 bg-white border border-slate-200 rounded-xl">
+                            <img id="addCoverPreviewImg" src="" alt="Pratinjau Cover" class="w-12 h-16 object-cover rounded-lg shadow-sm border border-slate-200">
+                            <div class="flex-grow min-w-0">
+                                <p class="text-xs font-bold text-slate-800">Pratinjau Gambar Cover</p>
+                                <p id="addCoverPreviewName" class="text-[11px] text-slate-500 truncate">file-gambar.jpg</p>
+                            </div>
+                            <button type="button" id="removeAddCoverBtn" class="text-xs font-bold text-rose-600 hover:text-rose-800 px-2 py-1 flex-shrink-0">
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Opsi Penanda Buku TKA -->
+                    <div class="md:col-span-3 bg-amber-50 border border-amber-200 p-3.5 rounded-xl flex items-center space-x-3">
+                        <input type="checkbox" id="bookIsTkaCheckbox" class="w-4 h-4 text-amber-500 rounded focus:ring-amber-400 border-slate-300 cursor-pointer">
+                        <label for="bookIsTkaCheckbox" class="text-xs font-bold text-amber-950 cursor-pointer select-none">
+                            ⭐ Tandai sebagai "Koleksi Buku TKA (Tes Kemampuan Akademik)"
+                            <span class="block font-normal text-amber-800 text-[11px]">
+                                Buku ini akan otomatis masuk ke bagian carousel horizontal poster 3:4 paling atas di katalog siswa.
+                            </span>
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" id="submitAddBookBtn" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 shadow-md transition disabled:opacity-60">
+                        <span id="addBookSpinner" class="hidden animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent mr-2"></span>
+                        <span id="addBookText">Simpan Buku ke Database</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- =====================================================================
+             BAGIAN 3: MANAJEMEN STOK CEPAT (+ / -) & EDIT COVER BUKU
+             ===================================================================== -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">
+                        Manajemen Stok Cepat & Gambar Cover
+                    </h2>
+                    <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                        Tambah/kurangi stok buku dengan tombol (+ / -) dan perbarui foto sampul langsung.
+                    </p>
+                </div>
+                <!-- Search Katalog Buku -->
+                <div class="flex items-center space-x-2 w-full md:w-auto">
+                    <div class="w-full md:w-64">
+                        <input 
+                            type="text" 
+                            id="searchCatalogInput" 
+                            placeholder="Cari judul buku di katalog..." 
+                            class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 transition"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Katalog Buku Admin (Scrollable di HP) -->
+            <div class="table-container w-full overflow-x-auto min-w-full">
+                <table class="w-full text-left border-collapse text-xs min-w-[650px]">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-extrabold tracking-wider text-[10px] sm:text-[11px]">
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Sampul</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Judul & Pengarang</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4">Kategori</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4 text-center">Kelola Stok (+ / -)</th>
+                            <th class="py-2.5 px-3 sm:py-3.5 sm:px-4 text-center">Aksi Cover & Hapus</th>
+                        </tr>
+                    </thead>
+                    <tbody id="catalogTableBody" class="divide-y divide-slate-100">
+                        <!-- Baris buku dirender dinamis -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Edit Cover Buku -->
+    <div id="editCoverModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+            <h3 class="text-base font-extrabold text-slate-900 mb-0.5">Perbarui Sampul Buku</h3>
+            <p id="editCoverBookTitle" class="text-xs text-slate-500 mb-4 line-clamp-1">Judul Buku</p>
+            <input type="hidden" id="editCoverBookId">
+            
+            <div class="space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700">Pilih Metode:</span>
+                    <div class="inline-flex rounded-xl bg-slate-100 p-1 text-[11px] font-bold">
+                        <button type="button" id="tabModalCoverFileBtn" class="px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition">
+                            📁 File HP/PC
+                        </button>
+                        <button type="button" id="tabModalCoverUrlBtn" class="px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition">
+                            🔗 Tautan URL
+                        </button>
+                    </div>
+                </div>
+
+                <div id="modalCoverFileContent" class="space-y-1.5">
+                    <input 
+                        type="file" 
+                        id="modalCoverFileInput" 
+                        accept="image/png, image/jpeg, image/jpg, image/webp" 
+                        class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-900 cursor-pointer"
+                    >
+                </div>
+
+                <div id="modalCoverUrlContent" class="hidden space-y-1.5">
+                    <input 
+                        type="url" 
+                        id="newCoverUrlInput" 
+                        placeholder="https://... masukkan tautan gambar baru" 
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 transition"
+                    >
+                </div>
+
+                <div id="modalCoverPreviewContainer" class="flex items-center space-x-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    <img id="modalCoverPreviewImg" src="" alt="Pratinjau" class="w-12 h-16 object-cover rounded-lg shadow-sm border border-slate-300">
+                    <div class="flex-grow min-w-0">
+                        <p class="text-xs font-bold text-slate-800">Pratinjau Gambar</p>
+                        <p id="modalCoverPreviewText" class="text-[11px] text-slate-500 truncate">Belum ada gambar baru</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 flex justify-end space-x-2">
+                <button type="button" id="cancelEditCoverBtn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+                    Batal
+                </button>
+                <button type="button" id="saveEditCoverBtn" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 transition shadow">
+                    Simpan Cover
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 hidden max-w-sm w-full p-4 rounded-2xl shadow-2xl border flex items-center space-x-3 transition-all duration-300">
+        <span id="toastIcon" class="text-2xl flex-shrink-0">✅</span>
+        <div class="flex-grow min-w-0">
+            <h4 id="toastTitle" class="text-xs font-bold leading-tight text-slate-900">Notifikasi</h4>
+            <p id="toastMessage" class="text-xs text-slate-600 mt-0.5 truncate">Pesan tindakan.</p>
+        </div>
+        <button id="closeToastBtn" class="text-slate-400 hover:text-slate-600 p-1 text-sm font-bold">✕</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 px-4 text-center text-xs mt-auto">
+        Perpustakaan Digital SMKN 1 Sorong &bull; Sistem Panel Admin Terproteksi
+    </footer>
+
+    <!-- File Konfigurasi Supabase -->
+    <script src="js/config.js"></script>
+
+    <!-- LOGIKA JAVASCRIPT ADMIN DASHBOARD -->
+    <script>
+        // =====================================================================
+        // A. VARIABEL GLOBAL & DOM
+        // =====================================================================
+        let supabaseClient = null;
+        let realtimeChannel = null;
+        let allBorrowRecords = [];
+        let allBooksList = [];
+        let allBooksMap = {};
+        let toastTimeout = null;
+
+        let selectedAddBookFile = null;
+        let selectedModalCoverFile = null;
+
+        const adminEmailDisplay = document.getElementById('adminEmailDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addBookForm = document.getElementById('addBookForm');
+        const submitAddBookBtn = document.getElementById('submitAddBookBtn');
+        const addBookSpinner = document.getElementById('addBookSpinner');
+        const addBookText = document.getElementById('addBookText');
+
+        const tabAddCoverFileBtn = document.getElementById('tabAddCoverFileBtn');
+        const tabAddCoverUrlBtn = document.getElementById('tabAddCoverUrlBtn');
+        const addCoverFileTabContent = document.getElementById('addCoverFileTabContent');
+        const addCoverUrlTabContent = document.getElementById('addCoverUrlTabContent');
+        const bookCoverFileInput = document.getElementById('bookCoverFileInput');
+        const bookCoverUrlInput = document.getElementById('bookCoverUrlInput');
+        const addCoverPreviewContainer = document.getElementById('addCoverPreviewContainer');
+        const addCoverPreviewImg = document.getElementById('addCoverPreviewImg');
+        const addCoverPreviewName = document.getElementById('addCoverPreviewName');
+        const removeAddCoverBtn = document.getElementById('removeAddCoverBtn');
+
+        const borrowRecordsTableBody = document.getElementById('borrowRecordsTableBody');
+        const emptyBorrowTable = document.getElementById('emptyBorrowTable');
+        const borrowStatusFilter = document.getElementById('borrowStatusFilter');
+        const refreshTableBtn = document.getElementById('refreshTableBtn');
+        const catalogTableBody = document.getElementById('catalogTableBody');
+        const searchCatalogInput = document.getElementById('searchCatalogInput');
+
+        const statTotalBooks = document.getElementById('statTotalBooks');
+        const statActiveBorrows = document.getElementById('statActiveBorrows');
+        const statOverdueBorrows = document.getElementById('statOverdueBorrows');
+        const statTkaBooks = document.getElementById('statTkaBooks');
+
+        const editCoverModal = document.getElementById('editCoverModal');
+        const editCoverBookId = document.getElementById('editCoverBookId');
+        const editCoverBookTitle = document.getElementById('editCoverBookTitle');
+        const tabModalCoverFileBtn = document.getElementById('tabModalCoverFileBtn');
+        const tabModalCoverUrlBtn = document.getElementById('tabModalCoverUrlBtn');
+        const modalCoverFileContent = document.getElementById('modalCoverFileContent');
+        const modalCoverUrlContent = document.getElementById('modalCoverUrlContent');
+        const modalCoverFileInput = document.getElementById('modalCoverFileInput');
+        const newCoverUrlInput = document.getElementById('newCoverUrlInput');
+        const modalCoverPreviewImg = document.getElementById('modalCoverPreviewImg');
+        const modalCoverPreviewText = document.getElementById('modalCoverPreviewText');
+        const cancelEditCoverBtn = document.getElementById('cancelEditCoverBtn');
+        const saveEditCoverBtn = document.getElementById('saveEditCoverBtn');
+
+        const toastNotification = document.getElementById('toastNotification');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const closeToastBtn = document.getElementById('closeToastBtn');
+
+        // =====================================================================
+        // B. FUNGSI SANITASI XSS & TOAST
+        // =====================================================================
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatWaNumber(phone) {
+            if (!phone) return '';
+            let cleaned = String(phone).replace(/[^0-9]/g, '');
+            if (cleaned.startsWith('0')) {
+                cleaned = '62' + cleaned.substring(1);
+            } else if (cleaned.startsWith('8')) {
+                cleaned = '62' + cleaned;
+            }
+            return cleaned;
+        }
+
+        function showToast(type, title, message) {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastNotification.className = "fixed bottom-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl shadow-2xl border flex items-center space-x-3 transition-all duration-300";
+
+            if (type === 'success') {
+                toastNotification.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-950');
+                toastIcon.textContent = '✅';
+            } else if (type === 'error') {
+                toastNotification.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-950');
+                toastIcon.textContent = '❌';
+            } else {
+                toastNotification.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-950');
+                toastIcon.textContent = 'ℹ️';
+            }
+
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            toastNotification.classList.remove('hidden');
+
+            toastTimeout = setTimeout(() => {
+                toastNotification.classList.add('hidden');
+            }, 4500);
+        }
+
+        closeToastBtn.addEventListener('click', () => {
+            toastNotification.classList.add('hidden');
+        });
+
+        // =====================================================================
+        // C. UPLOAD GAMBAR KE SUPABASE STORAGE DENGAN FALLBACK BASE64
+        // =====================================================================
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (err) => reject(err);
+            });
+        }
+
+        async function uploadCoverImage(file) {
+            if (!file) return null;
+
+            const bucketName = SUPABASE_CONFIG.storageBucket || 'book-covers';
+            const fileExt = file.name.split('.').pop();
+            const fileName = `cover-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+            const filePath = `uploads/${fileName}`;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .storage
+                    .from(bucketName)
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) {
+                    console.warn("Storage upload notice (menggunakan Base64):", error.message);
+                    return await fileToBase64(file);
+                }
+
+                const { data: publicData } = supabaseClient
+                    .storage
+                    .from(bucketName)
+                    .getPublicUrl(filePath);
+
+                return publicData.publicUrl;
+
+            } catch (err) {
+                console.warn("Upload gagal, menyimpan Base64:", err);
+                return await fileToBase64(file);
+            }
+        }
+
+        // =====================================================================
+        // D. KONTROL TABS & PREVIEW GAMBAR COVER (TAMBAH BUKU)
+        // =====================================================================
+        tabAddCoverFileBtn.addEventListener('click', () => {
+            tabAddCoverFileBtn.className = "px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition";
+            tabAddCoverUrlBtn.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition";
+            addCoverFileTabContent.classList.remove('hidden');
+            addCoverUrlTabContent.classList.add('hidden');
+        });
+
+        tabAddCoverUrlBtn.addEventListener('click', () => {
+            tabAddCoverUrlBtn.className = "px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition";
+            tabAddCoverFileBtn.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition";
+            addCoverUrlTabContent.classList.remove('hidden');
+            addCoverFileTabContent.classList.add('hidden');
+        });
+
+        bookCoverFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedAddBookFile = file;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    addCoverPreviewImg.src = event.target.result;
+                    addCoverPreviewName.textContent = file.name;
+                    addCoverPreviewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        bookCoverUrlInput.addEventListener('input', () => {
+            const url = bookCoverUrlInput.value.trim();
+            if (url) {
+                selectedAddBookFile = null;
+                addCoverPreviewImg.src = url;
+                addCoverPreviewName.textContent = "URL Tautan Online";
+                addCoverPreviewContainer.classList.remove('hidden');
+            } else if (!selectedAddBookFile) {
+                addCoverPreviewContainer.classList.add('hidden');
+            }
+        });
+
+        removeAddCoverBtn.addEventListener('click', () => {
+            selectedAddBookFile = null;
+            bookCoverFileInput.value = '';
+            bookCoverUrlInput.value = '';
+            addCoverPreviewContainer.classList.add('hidden');
+        });
+
+        // =====================================================================
+        // E. KONTROL TABS & PREVIEW GAMBAR COVER (MODAL EDIT COVER)
+        // =====================================================================
+        tabModalCoverFileBtn.addEventListener('click', () => {
+            tabModalCoverFileBtn.className = "px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition";
+            tabModalCoverUrlBtn.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition";
+            modalCoverFileContent.classList.remove('hidden');
+            modalCoverUrlContent.classList.add('hidden');
+        });
+
+        tabModalCoverUrlBtn.addEventListener('click', () => {
+            tabModalCoverUrlBtn.className = "px-3 py-1 rounded-lg bg-white text-blue-900 shadow-sm transition";
+            tabModalCoverFileBtn.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-blue-900 transition";
+            modalCoverUrlContent.classList.remove('hidden');
+            modalCoverFileContent.classList.add('hidden');
+        });
+
+        modalCoverFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedModalCoverFile = file;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    modalCoverPreviewImg.src = event.target.result;
+                    modalCoverPreviewText.textContent = `File: ${file.name}`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        newCoverUrlInput.addEventListener('input', () => {
+            const url = newCoverUrlInput.value.trim();
+            if (url) {
+                selectedModalCoverFile = null;
+                modalCoverPreviewImg.src = url;
+                modalCoverPreviewText.textContent = "Tautan URL Online";
+            }
+        });
+
+        // =====================================================================
+        // F. PROTEKSI AUTENTIKASI ADMIN
+        // =====================================================================
+        async function checkAuthSession() {
+            try {
+                supabaseClient = window.supabase.createClient(
+                    SUPABASE_CONFIG.url,
+                    SUPABASE_CONFIG.anonKey
+                );
+
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    window.location.replace('login.html');
+                    return false;
+                }
+
+                adminEmailDisplay.textContent = session.user.email;
+
+                supabaseClient.auth.onAuthStateChange((event, newSession) => {
+                    if (event === 'SIGNED_OUT' || !newSession) {
+                        window.location.replace('login.html');
+                    }
+                });
+
+                return true;
+            } catch (err) {
+                console.error("Gagal memeriksa sesi admin:", err);
+                window.location.replace('login.html');
+                return false;
+            }
+        }
+
+        logoutBtn.addEventListener('click', async () => {
+            if (confirm("Apakah Anda yakin ingin keluar dari panel admin?")) {
+                await supabaseClient.auth.signOut();
+                window.location.replace('login.html');
+            }
+        });
+
+        // =====================================================================
+        // G. AMBIL DATA DARI DATABASE
+        // =====================================================================
+        async function fetchAllData() {
+            try {
+                const { data: books, error: booksError } = await supabaseClient
+                    .from('books')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (booksError) throw booksError;
+
+                allBooksList = books || [];
+                allBooksMap = {};
+                let tkaCount = 0;
+                allBooksList.forEach(b => {
+                    allBooksMap[b.id] = b;
+                    if (b.is_tka) tkaCount++;
+                });
+
+                statTotalBooks.textContent = allBooksList.length;
+                statTkaBooks.textContent = tkaCount;
+
+                await fetchBorrowRecords();
+                renderCatalogTable();
+
+            } catch (err) {
+                console.error("Gagal memuat data dashboard:", err);
+                showToast('error', 'Gagal Memuat Data', err.message);
+            }
+        }
+
+        async function fetchBorrowRecords() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('borrow_records')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allBorrowRecords = data || [];
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                let activeCount = 0;
+                let overdueCount = 0;
+
+                allBorrowRecords.forEach(r => {
+                    if (r.status === 'borrowed') {
+                        activeCount++;
+                        if (r.due_date && r.due_date < todayStr) {
+                            overdueCount++;
+                        }
+                    }
+                });
+
+                statActiveBorrows.textContent = activeCount;
+                statOverdueBorrows.textContent = overdueCount;
+
+                renderBorrowTable();
+
+            } catch (err) {
+                console.error("Gagal mengambil catatan pinjam:", err);
+            }
+        }
+
+        // =====================================================================
+        // H. RENDER TABEL PEMANTAUAN PEMINJAMAN SISWA
+        // =====================================================================
+        function renderBorrowTable() {
+            borrowRecordsTableBody.innerHTML = '';
+            const statusFilter = borrowStatusFilter.value;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            const filtered = allBorrowRecords.filter(r => {
+                const isOverdue = r.status === 'borrowed' && r.due_date && (r.due_date < todayStr);
+                if (statusFilter === 'ALL') return true;
+                if (statusFilter === 'overdue') return isOverdue;
+                return r.status === statusFilter;
+            });
+
+            if (filtered.length === 0) {
+                emptyBorrowTable.classList.remove('hidden');
+                return;
+            } else {
+                emptyBorrowTable.classList.add('hidden');
+            }
+
+            filtered.forEach((rec, index) => {
+                const safeName = escapeHtml(rec.student_name);
+                const safeNis = escapeHtml(rec.student_nis);
+                const safeClass = escapeHtml(rec.student_class || 'Belum Diisi');
+                const safeMajor = escapeHtml(rec.student_major || '-');
+                const rawPhone = rec.student_phone || '';
+                const waPhone = formatWaNumber(rawPhone);
+                const safePhone = escapeHtml(rawPhone);
+
+                const book = allBooksMap[rec.book_id] || { title: 'Buku Tidak Diketahui', category: 'Umum' };
+                const safeBookTitle = escapeHtml(book.title);
+                const safeCategory = escapeHtml(book.category);
+                const safeBorrowDate = escapeHtml(rec.borrow_date);
+                const safeDueDate = escapeHtml(rec.due_date);
+                const isReturned = rec.status === 'returned';
+                const isOverdue = !isReturned && rec.due_date && (rec.due_date < todayStr);
+
+                // Draf Pesan WhatsApp
+                const waMessage = `Halo *${rec.student_name}* (${rec.student_class || ''} - ${rec.student_major || ''}), kami dari Petugas Perpustakaan SMKN 1 Sorong mengingatkan bahwa buku *\"${book.title}\"* yang Anda pinjam batas pengembaliannya adalah *${rec.due_date}*.\n\nMohon segera dikembalikan ke perpustakaan tepat waktu.\n⚠️ *Perhatian:* Keterlambatan pengembalian buku dikenakan denda *Rp15.000,- per buku*.\n\nTerima kasih. 🙏`;
+                const waLink = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}`;
+
+                // Badge Status
+                let statusBadge = '';
+                if (isReturned) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">✓ Kembali</span>`;
+                } else if (isOverdue) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 animate-pulse border border-rose-300">🚨 Denda Rp15.000</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">⏳ Dipinjam</span>`;
+                }
+
+                // Tombol Aksi
+                let actionHtml = '';
+                if (!isReturned) {
+                    const waBtn = waPhone ? `
+                        <a href="${waLink}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition" title="Kirim Pesan WhatsApp Pengingat">
+                            💬 WA
+                        </a>
+                    ` : '';
+
+                    actionHtml = `
+                        <div class="flex items-center justify-center gap-1 flex-wrap">
+                            ${waBtn}
+                            <button onclick="confirmReturnBook('${rec.id}', '${rec.book_id}', '${safeName}', '${safeBookTitle}')" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white shadow-sm transition" title="Konfirmasi Pengembalian">
+                                Kembalikan
+                            </button>
+                            <button onclick="cancelBorrowRequest('${rec.id}', '${rec.book_id}', '${safeName}', '${safeBookTitle}')" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 shadow-sm transition" title="Batalkan & Kembalikan Stok">
+                                ❌ Batalkan
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionHtml = `<span class="text-slate-400 italic text-[11px]">Selesai</span>`;
+                }
+
+                const isHourly = (rec.student_class || '').includes('Jam Pelajaran');
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">
+                        <div class="font-extrabold text-slate-900">${safeName}</div>
+                        <div class="text-[11px] text-slate-500 font-mono">NIS: ${safeNis}</div>
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">
+                        <div class="font-bold text-blue-900">${safeClass}</div>
+                        <div class="text-[11px] text-slate-600 font-medium">${safeMajor}</div>
+                        ${isHourly ? `
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-950 border border-amber-300">
+                                    ⚡ Jam Pelajaran (07:30 - 14:45 WIT)
+                                </span>
+                            </div>
+                        ` : ''}
+                        ${safePhone ? `<div class="text-[11px] text-emerald-700 font-mono mt-0.5">📞 ${safePhone}</div>` : ''}
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 max-w-xs">
+                        <div class="font-bold text-slate-800 line-clamp-1">${safeBookTitle}</div>
+                        <span class="inline-block text-[10px] text-blue-800 bg-blue-50 px-2 py-0.5 rounded font-bold">
+                            ${safeCategory}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">
+                        <div class="text-slate-600">Pinjam: <span class="font-bold text-slate-800">${safeBorrowDate}</span></div>
+                        <div class="text-slate-500 text-[11px]">Tenggat: <span class="font-extrabold ${isOverdue ? 'text-rose-600' : 'text-slate-800'}">${safeDueDate}</span></div>
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 text-center">
+                        ${isReturned ? `
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold text-slate-400 bg-slate-100">
+                                ✓ Selesai
+                            </span>
+                        ` : `
+                            <div class="admin-borrow-timer inline-block" data-due-date="${escapeHtml(rec.due_date || '')}" data-is-hourly="${isHourly ? 'true' : 'false'}">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-[10px] sm:text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1 animate-pulse"></span>
+                                    ⏱️ Menghitung...
+                                </span>
+                            </div>
+                        `}
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 text-center">${statusBadge}</td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 text-center">${actionHtml}</td>
+                `;
+
+                borrowRecordsTableBody.appendChild(tr);
+            });
+
+            // Jalankan update timer countdown realtime langsung setelah render tabel
+            updateAdminBorrowTimers();
+        }
+
+        // =====================================================================
+        // I. TIMER HITUNG MUNDUR REAL-TIME PEMINJAMAN SISWA (ADMIN)
+        // =====================================================================
+        let adminTimerInterval = null;
+
+        function updateAdminBorrowTimers() {
+            const timerElements = document.querySelectorAll('.admin-borrow-timer');
+            if (!timerElements || timerElements.length === 0) return;
+
+            const now = Date.now();
+
+            timerElements.forEach(el => {
+                const dueDateStr = el.getAttribute('data-due-date');
+                if (!dueDateStr) {
+                    el.innerHTML = `<span class="text-slate-400 text-[10px]">-</span>`;
+                    return;
+                }
+
+                const isHourly = el.getAttribute('data-is-hourly') === 'true';
+
+                // Jika Jam Pelajaran: target adalah 14:45:00 WIT pada tanggal jatuh tempo
+                // Jika Reguler: target adalah 23:59:59 pada tanggal jatuh tempo
+                const dueTime = isHourly 
+                    ? new Date(dueDateStr + 'T14:45:00').getTime() 
+                    : new Date(dueDateStr + 'T23:59:59').getTime();
+
+                const diff = dueTime - now;
+
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    const text = days > 0 
+                        ? `${days}h ${hours}j ${minutes}m` 
+                        : `${hours}j ${minutes}m ${seconds}s`;
+
+                    el.innerHTML = `
+                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xl text-[10px] sm:text-[11px] font-extrabold bg-amber-50 text-amber-950 border border-amber-300 shadow-2xs font-mono">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>
+                            ⏱️ ${isHourly ? '⚡ ' : ''}Sisa ${text}
+                        </span>
+                    `;
+                } else {
+                    const overdueDiff = Math.abs(diff);
+                    const days = Math.floor(overdueDiff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((overdueDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((overdueDiff % (1000 * 60)) / 1000);
+
+                    const overdueText = days > 0 
+                        ? `Lewat ${days}h ${hours}j` 
+                        : (hours > 0 ? `Lewat ${hours}j ${minutes}m` : `Lewat ${minutes}m`);
+
+                    el.innerHTML = `
+                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xl text-[10px] sm:text-[11px] font-extrabold bg-rose-50 text-rose-950 border border-rose-300 shadow-2xs font-mono animate-pulse">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-600 mr-1.5"></span>
+                            🚨 ${isHourly ? '⚡ ' : ''}${overdueText} (Denda)
+                        </span>
+                    `;
+                }
+            });
+        }
+
+        function startAdminTimer() {
+            if (adminTimerInterval) clearInterval(adminTimerInterval);
+            updateAdminBorrowTimers();
+            adminTimerInterval = setInterval(updateAdminBorrowTimers, 1000);
+        }
+
+        // =====================================================================
+        // J. PENGATURAN KODE VERIFIKASI KIOS ANJUNGAN PERPUS
+        // =====================================================================
+        function getKioskAuthCode() {
+            return localStorage.getItem('smkn1_kiosk_auth_code') || 
+                   (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.adminAuthCode) || 
+                   'PERPUS2026';
+        }
+
+        function refreshKioskCodeDisplay() {
+            const badge = document.getElementById('currentActiveCodeBadge');
+            const input = document.getElementById('kioskAuthCodeSettingInput');
+            const code = getKioskAuthCode();
+            if (badge) badge.textContent = code;
+            if (input) input.placeholder = code;
+        }
+
+        window.saveKioskAuthCodeSetting = function() {
+            const input = document.getElementById('kioskAuthCodeSettingInput');
+            if (!input) return;
+            const newCode = input.value.trim().toUpperCase();
+            if (!newCode || newCode.length < 3) {
+                alert('Kode verifikasi minimal harus terdiri dari 3 karakter!');
+                input.focus();
+                return;
+            }
+
+            localStorage.setItem('smkn1_kiosk_auth_code', newCode);
+            refreshKioskCodeDisplay();
+            input.value = '';
+            showToast('success', 'Kode Kios Disimpan!', `Kode otorisasi peminjaman baru: ${newCode}`);
+        };
+
+        window.resetKioskAuthCodeSetting = function() {
+            if (confirm('Kembalikan kode verifikasi peminjaman kios ke default: PERPUS2026?')) {
+                localStorage.setItem('smkn1_kiosk_auth_code', 'PERPUS2026');
+                refreshKioskCodeDisplay();
+                showToast('info', 'Kode Direset', 'Kode verifikasi kios dikembalikan ke default: PERPUS2026');
+            }
+        };
+
+        // =====================================================================
+        // K. EKSPORT DATA PEMINJAMAN KE FILE EXCEL (.xlsx) MENGGUNAKAN SheetJS
+        // =====================================================================
+        window.exportBorrowToExcel = function() {
+            // Validasi: pastikan ada data peminjaman
+            if (!allBorrowRecords || allBorrowRecords.length === 0) {
+                alert('Belum ada data peminjaman yang bisa dieksport.');
+                return;
+            }
+
+            // Siapkan baris data untuk sheet Excel
+            const todayStr = new Date().toISOString().split('T')[0];
+            const now = Date.now();
+            const rows = allBorrowRecords.map((rec, idx) => {
+                const book = allBooksMap[rec.book_id] || { title: 'Tidak Diketahui', category: '-' };
+                const isReturned = rec.status === 'returned';
+                const isOverdue = !isReturned && rec.due_date && (rec.due_date < todayStr);
+                const isHourly = (rec.student_class || '').includes('Jam Pelajaran');
+
+                let statusLabel = 'Dipinjam';
+                if (isReturned) statusLabel = 'Dikembalikan';
+                else if (isOverdue) statusLabel = 'Terlambat (Denda Rp15.000)';
+
+                let sisaWaktuLabel = '-';
+                if (!isReturned && rec.due_date) {
+                    const dueTime = isHourly 
+                        ? new Date(rec.due_date + 'T14:45:00').getTime() 
+                        : new Date(rec.due_date + 'T23:59:59').getTime();
+                    const diff = dueTime - now;
+                    if (diff > 0) {
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        sisaWaktuLabel = days > 0 ? `Sisa ${days} Hari ${hours} Jam` : `Sisa ${hours} Jam (Hari Ini)`;
+                    } else {
+                        const od = Math.abs(diff);
+                        const days = Math.floor(od / (1000 * 60 * 60 * 24));
+                        sisaWaktuLabel = days > 0 ? `Terlambat ${days} Hari (Denda Rp15.000)` : `Lewat Jam Sekolah (Denda Rp15.000)`;
+                    }
+                }
+
+                return {
+                    'No': idx + 1,
+                    'Nama Siswa': rec.student_name || '-',
+                    'NIS': rec.student_nis || '-',
+                    'Kelas': rec.student_class || '-',
+                    'Jurusan': rec.student_major || '-',
+                    'No. WhatsApp': rec.student_phone || '-',
+                    'Judul Buku': book.title,
+                    'Kategori Buku': book.category,
+                    'Tanggal Pinjam': rec.borrow_date || '-',
+                    'Tenggat Kembali': rec.due_date || '-',
+                    'Sisa Waktu (Realtime)': sisaWaktuLabel,
+                    'Tanggal Kembali': rec.return_date || '-',
+                    'Status': statusLabel
+                };
+            });
+
+            // Buat worksheet dan workbook menggunakan SheetJS
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+
+            // Atur lebar kolom agar rapi saat dibuka di Excel
+            worksheet['!cols'] = [
+                { wch: 4 },   // No
+                { wch: 22 },  // Nama Siswa
+                { wch: 12 },  // NIS
+                { wch: 10 },  // Kelas
+                { wch: 30 },  // Jurusan
+                { wch: 15 },  // No. WhatsApp
+                { wch: 35 },  // Judul Buku
+                { wch: 18 },  // Kategori Buku
+                { wch: 14 },  // Tanggal Pinjam
+                { wch: 14 },  // Tenggat Kembali
+                { wch: 24 },  // Sisa Waktu (Realtime)
+                { wch: 14 },  // Tanggal Kembali
+                { wch: 25 }   // Status
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Laporan Peminjaman');
+
+            // Unduh file Excel
+            XLSX.writeFile(workbook, 'Laporan_Peminjaman_Perpus_SMKN1.xlsx');
+
+            alert('✅ Laporan berhasil dieksport ke file Excel!\nNama file: Laporan_Peminjaman_Perpus_SMKN1.xlsx');
+        };
+
+        // =====================================================================
+        // M. KONFIRMASI PENGEMBALIAN BUKU
+        // =====================================================================
+        window.confirmReturnBook = async function(recordId, bookId, studentName, bookTitle) {
+            const konfirmasi = confirm(`Konfirmasi bahwa buku "${bookTitle}" telah dikembalikan oleh siswa ${studentName}?\n\nStok buku akan otomatis bertambah 1.`);
+            if (!konfirmasi) return;
+
+            try {
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                const { error: recordError } = await supabaseClient
+                    .from('borrow_records')
+                    .update({
+                        status: 'returned',
+                        return_date: todayStr
+                    })
+                    .eq('id', recordId);
+
+                if (recordError) throw recordError;
+
+                const currentBook = allBooksMap[bookId];
+                const currentStock = currentBook ? parseInt(currentBook.stock, 10) : 0;
+                const newStock = currentStock + 1;
+
+                const { error: stockError } = await supabaseClient
+                    .from('books')
+                    .update({ stock: newStock })
+                    .eq('id', bookId);
+
+                if (stockError) console.warn("Stock error:", stockError);
+
+                showToast('success', 'Buku Dikembalikan!', `Buku "${bookTitle}" berhasil dicatat kembali. Stok bertambah menjadi ${newStock}.`);
+                await fetchAllData();
+
+            } catch (err) {
+                console.error("Gagal proses pengembalian:", err);
+                showToast('error', 'Gagal Pengembalian', err.message);
+            }
+        };
+
+        // =====================================================================
+        // N. PEMBATALAN / PENOLAKAN PEMINJAMAN OLEH ADMIN (RESTOCK OTOMATIS)
+        // =====================================================================
+        window.cancelBorrowRequest = async function(recordId, bookId, studentName, bookTitle) {
+            const konfirmasi = confirm(`Batalkan peminjaman buku "${bookTitle}" atas nama ${studentName}?\n\nStok buku akan otomatis dikembalikan (+1) ke database.`);
+            if (!konfirmasi) return;
+
+            try {
+                // 1. Ubah status borrow_records menjadi 'canceled'
+                const { error: recordError } = await supabaseClient
+                    .from('borrow_records')
+                    .update({ status: 'canceled' })
+                    .eq('id', recordId);
+
+                if (recordError) throw recordError;
+
+                // 2. Kembalikan (restock) stok buku +1 secara otomatis
+                const currentBook = allBooksMap[bookId];
+                const currentStock = currentBook ? parseInt(currentBook.stock, 10) : 0;
+                const newStock = currentStock + 1;
+
+                const { error: stockError } = await supabaseClient
+                    .from('books')
+                    .update({ stock: newStock })
+                    .eq('id', bookId);
+
+                if (stockError) console.warn("Restock warning:", stockError);
+
+                showToast('success', 'Peminjaman Dibatalkan', `Peminjaman "${bookTitle}" oleh ${studentName} dibatalkan. Stok buku kembali menjadi ${newStock} eks.`);
+                await fetchAllData();
+
+            } catch (err) {
+                console.error("Gagal batalkan peminjaman:", err);
+                showToast('error', 'Gagal Membatalkan', err.message || 'Terjadi kesalahan saat membatalkan peminjaman.');
+            }
+        };
+
+        // =====================================================================
+        // J. TABEL MANAJEMEN KATALOG & STOK CEPAT (+ / -) & EDIT COVER
+        // =====================================================================
+        function renderCatalogTable() {
+            catalogTableBody.innerHTML = '';
+            const query = searchCatalogInput.value.trim().toLowerCase();
+
+            const filtered = allBooksList.filter(b => {
+                const titleMatch = b.title ? b.title.toLowerCase().includes(query) : false;
+                const authorMatch = b.author ? b.author.toLowerCase().includes(query) : false;
+                return titleMatch || authorMatch;
+            });
+
+            if (filtered.length === 0) {
+                catalogTableBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400">Tidak ada buku ditemukan.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(book => {
+                const safeId = escapeHtml(book.id);
+                const safeTitle = escapeHtml(book.title);
+                const safeAuthor = escapeHtml(book.author);
+                const safeCategory = escapeHtml(book.category);
+                const coverUrl = book.cover_url ? escapeHtml(book.cover_url) : '';
+                const stock = parseInt(book.stock, 10) || 0;
+                const isTka = Boolean(book.is_tka);
+
+                const coverThumb = coverUrl ? `
+                    <img src="${coverUrl}" class="w-9 h-12 sm:w-10 sm:h-14 object-cover rounded shadow-sm border border-slate-200">
+                ` : `
+                    <div class="w-9 h-12 sm:w-10 sm:h-14 bg-blue-900 rounded flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                        📖
+                    </div>
+                `;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">${coverThumb}</td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">
+                        <div class="font-extrabold text-slate-900 line-clamp-1">${safeTitle}</div>
+                        <div class="text-[11px] text-slate-500">✍️ ${safeAuthor}</div>
+                        ${isTka ? '<span class="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">⭐ TKA</span>' : ''}
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4">
+                        <span class="text-[10px] font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded">
+                            ${safeCategory}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 text-center">
+                        <div class="inline-flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl">
+                            <button onclick="updateQuickStock('${safeId}', -1)" class="w-6 h-6 sm:w-7 sm:h-7 bg-white hover:bg-rose-50 text-rose-600 rounded-lg font-extrabold shadow-sm transition border border-slate-200 flex items-center justify-center" title="Kurangi 1">
+                                -
+                            </button>
+                            <span class="w-7 text-center font-extrabold text-xs sm:text-sm text-slate-800">${stock}</span>
+                            <button onclick="updateQuickStock('${safeId}', 1)" class="w-6 h-6 sm:w-7 sm:h-7 bg-white hover:bg-emerald-50 text-emerald-600 rounded-lg font-extrabold shadow-sm transition border border-slate-200 flex items-center justify-center" title="Tambah 1">
+                                +
+                            </button>
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-3 sm:py-3 sm:px-4 text-center">
+                        <div class="inline-flex items-center space-x-1.5">
+                            <button onclick="openEditCoverModal('${safeId}', '${safeTitle.replace(/'/g, "\\'")}', '${coverUrl.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-blue-50 text-blue-900 border border-slate-200 transition">
+                                Cover
+                            </button>
+                            <button onclick="deleteBook('${safeId}', '${safeTitle.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition" title="Hapus Buku">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                catalogTableBody.appendChild(tr);
+            });
+        }
+
+        // Quick Stock (+ / -)
+        window.updateQuickStock = async function(bookId, delta) {
+            const currentBook = allBooksMap[bookId];
+            if (!currentBook) return;
+
+            const currentStock = parseInt(currentBook.stock, 10) || 0;
+            const newStock = Math.max(0, currentStock + delta);
+
+            try {
+                const { error } = await supabaseClient
+                    .from('books')
+                    .update({ stock: newStock })
+                    .eq('id', bookId);
+
+                if (error) throw error;
+
+                currentBook.stock = newStock;
+                renderCatalogTable();
+                showToast('success', 'Stok Diperbarui', `Stok "${currentBook.title}": ${newStock} eks.`);
+
+            } catch (err) {
+                console.error("Gagal update stok:", err);
+                showToast('error', 'Gagal', err.message);
+            }
+        };
+
+        // =====================================================================
+        // K. MODAL EDIT COVER (DUAL INPUT: FILE ATAU URL)
+        // =====================================================================
+        window.openEditCoverModal = function(bookId, title, currentCover) {
+            editCoverBookId.value = bookId;
+            editCoverBookTitle.textContent = title;
+            newCoverUrlInput.value = currentCover || '';
+            selectedModalCoverFile = null;
+            modalCoverFileInput.value = '';
+
+            if (currentCover) {
+                modalCoverPreviewImg.src = currentCover;
+                modalCoverPreviewText.textContent = "Sampul Saat Ini";
+            } else {
+                modalCoverPreviewImg.src = '';
+                modalCoverPreviewText.textContent = "Belum ada sampul";
+            }
+
+            editCoverModal.classList.remove('hidden');
+        };
+
+        cancelEditCoverBtn.addEventListener('click', () => {
+            editCoverModal.classList.add('hidden');
+        });
+
+        saveEditCoverBtn.addEventListener('click', async () => {
+            const bookId = editCoverBookId.value;
+            saveEditCoverBtn.disabled = true;
+            saveEditCoverBtn.textContent = "Mengunggah...";
+
+            try {
+                let finalCoverUrl = null;
+
+                if (selectedModalCoverFile) {
+                    finalCoverUrl = await uploadCoverImage(selectedModalCoverFile);
+                } else {
+                    finalCoverUrl = newCoverUrlInput.value.trim() || null;
+                }
+
+                const { error } = await supabaseClient
+                    .from('books')
+                    .update({ cover_url: finalCoverUrl })
+                    .eq('id', bookId);
+
+                if (error) throw error;
+
+                editCoverModal.classList.add('hidden');
+                showToast('success', 'Cover Berhasil Diperbarui!', 'Sampul baru buku telah disimpan.');
+                await fetchAllData();
+
+            } catch (err) {
+                console.error("Gagal simpan cover:", err);
+                showToast('error', 'Gagal Simpan', err.message);
+            } finally {
+                saveEditCoverBtn.disabled = false;
+                saveEditCoverBtn.textContent = "Simpan Cover";
+            }
+        });
+
+        // Hapus Buku secara permanen dari database Supabase
+        window.deleteBook = async function(bookId, title) {
+            if (!confirm(`Hapus buku "${title}" dari katalog perpustakaan secara permanen?\n\n⚠️ Peringatan: Buku tidak dapat dihapus jika masih terkait dengan riwayat peminjaman aktif.`)) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('books')
+                    .delete()
+                    .eq('id', bookId);
+
+                if (error) {
+                    // Tangani error foreign key constraint (buku masih ada di borrow_records)
+                    if (error.code === '23503' || (error.message && error.message.toLowerCase().includes('foreign key'))) {
+                        showToast('error', 'Tidak Dapat Dihapus', `Buku "${title}" masih memiliki catatan peminjaman. Selesaikan semua peminjaman terlebih dahulu.`);
+                    } else {
+                        showToast('error', 'Gagal Hapus', `Error: ${error.message}`);
+                    }
+                    return;
+                }
+
+                // Hapus dari array lokal agar render langsung tanpa reload penuh
+                allBooksList = allBooksList.filter(b => String(b.id) !== String(bookId));
+                delete allBooksMap[bookId];
+                renderCatalogTable();
+
+                // Perbarui statistik
+                statTotalBooks.textContent = allBooksList.length;
+                const tkaCount = allBooksList.filter(b => b.is_tka).length;
+                statTkaBooks.textContent = tkaCount;
+
+                showToast('success', 'Buku Dihapus', `Buku "${title}" telah dihapus permanen dari database.`);
+
+            } catch (err) {
+                console.error("Gagal hapus buku:", err);
+                showToast('error', 'Gagal Hapus', err.message || 'Terjadi kesalahan saat menghapus buku.');
+            }
+        };
+
+        // =====================================================================
+        // L. SUBMIT TAMBAH BUKU BARU (DENGAN KATEGORI RESMI & 8 JURUSAN)
+        // =====================================================================
+        addBookForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('bookTitleInput').value.trim();
+            const author = document.getElementById('bookAuthorInput').value.trim();
+            const mainCategory = document.getElementById('bookCategoryInput').value.trim();
+            const targetMajor = document.getElementById('bookTargetMajorInput').value.trim();
+            const stock = parseInt(document.getElementById('bookStockInput').value, 10) || 1;
+            const ebookUrl = document.getElementById('bookEbookUrlInput').value.trim();
+            const isTka = document.getElementById('bookIsTkaCheckbox').checked;
+
+            if (!title || !author || !mainCategory) {
+                showToast('error', 'Data Belum Lengkap', 'Judul, Penulis, dan Kategori wajib diisi.');
+                return;
+            }
+
+            // Gabungkan kategori jika ada jurusan spesifik
+            let finalCategory = mainCategory;
+            if (mainCategory === 'Kejuruan' && targetMajor) {
+                finalCategory = `Kejuruan (${targetMajor})`;
+            }
+
+            submitAddBookBtn.disabled = true;
+            addBookSpinner.classList.remove('hidden');
+            addBookText.textContent = "Mengunggah & Menyimpan...";
+
+            try {
+                let finalCoverUrl = null;
+
+                if (selectedAddBookFile) {
+                    finalCoverUrl = await uploadCoverImage(selectedAddBookFile);
+                } else {
+                    finalCoverUrl = bookCoverUrlInput.value.trim() || null;
+                }
+
+                const { error } = await supabaseClient
+                    .from('books')
+                    .insert([{
+                        title: title,
+                        author: author,
+                        category: finalCategory,
+                        stock: stock,
+                        ebook_url: ebookUrl ? ebookUrl : null,
+                        cover_url: finalCoverUrl,
+                        is_tka: isTka
+                    }]);
+
+                if (error) throw error;
+
+                showToast('success', 'Buku Berhasil Ditambahkan!', `Buku "${title}" telah tersedia di katalog.`);
+                addBookForm.reset();
+                selectedAddBookFile = null;
+                addCoverPreviewContainer.classList.add('hidden');
+                document.getElementById('bookStockInput').value = 5;
+
+                await fetchAllData();
+
+            } catch (err) {
+                console.error("Gagal tambah buku:", err);
+                showToast('error', 'Gagal Menyimpan', err.message);
+            } finally {
+                submitAddBookBtn.disabled = false;
+                addBookSpinner.classList.add('hidden');
+                addBookText.textContent = "Simpan Buku ke Database";
+            }
+        });
+
+        // =====================================================================
+        // M. SUPABASE REALTIME LISTENER
+        // =====================================================================
+        function setupRealtimeListener() {
+            try {
+                realtimeChannel = supabaseClient
+                    .channel('admin-realtime-changes')
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'borrow_records' },
+                        (payload) => {
+                            console.log("⚡ Realtime peminjaman masuk:", payload);
+                            fetchBorrowRecords();
+                        }
+                    )
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'books' },
+                        (payload) => {
+                            console.log("⚡ Realtime buku berubah:", payload);
+                            fetchAllData();
+                        }
+                    )
+                    .subscribe();
+            } catch (err) {
+                console.warn("Realtime error:", err);
+            }
+        }
+
+        // Filter event listeners
+        borrowStatusFilter.addEventListener('change', renderBorrowTable);
+        searchCatalogInput.addEventListener('input', renderCatalogTable);
+        refreshTableBtn.addEventListener('click', () => {
+            fetchAllData();
+            showToast('info', 'Data Disinkronkan', 'Tabel berhasil disinkronkan ulang.');
+        });
+
+        // Load awal
+        document.addEventListener('DOMContentLoaded', async () => {
+            refreshKioskCodeDisplay();
+            const isAuthenticated = await checkAuthSession();
+            if (isAuthenticated) {
+                await fetchAllData();
+                setupRealtimeListener();
+                startAdminTimer();
+            }
+        });
+    </script>
+</body>
+</html>
