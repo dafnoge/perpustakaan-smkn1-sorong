@@ -89,16 +89,10 @@ Sesuai kepatuhan pedoman transparansi lomba, berikut adalah *tools* AI yang digu
 
 ---
 
-## 📹 7. Video Penjelasan Aplikasi
-- **Link Video**: `[Menunggu proses perekaman video demo maksimal 5 menit]`
-- **Catatan Isi Video**: Memuat perkenalan anggota tim, demonstrasi alur siswa di anjungan kios mandiri, verifikasi kode admin, hingga fitur pemicu denda WhatsApp.
-
----
-
-## 📊 8. Flyer & Infografis
+## 📊 7. Flyer & Infografis
 - **Status File**: Disimpan pada direktori `documentation/flyer-perpustakaan.png`.
 
 ---
 
-## 📄 9. Dokumentasi Projek & Kebermanfaatan
+## 📄 8. Dokumentasi Projek & Kebermanfaatan
 - **Status File**: Disimpan pada file `documentation/Dokumentasi_Perpustakaan_Digital_SMKN1.pdf`.
